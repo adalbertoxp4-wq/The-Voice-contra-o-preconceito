@@ -1,0 +1,989 @@
+/* =========================
+   CONFIGURAÇÕES GERAIS
+========================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+
+    margin: 0;
+
+    padding: 20px;
+
+    min-height: 100vh;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    color: #263238;
+
+    background:
+        linear-gradient(
+            135deg,
+            #18002d,
+            #4a148c,
+            #1565c0
+        );
+
+}
+
+
+/* =========================
+   CONTAINER PRINCIPAL
+========================= */
+
+main {
+
+    max-width: 1000px;
+
+    margin: auto;
+
+}
+
+
+/* =========================
+   SEÇÕES
+========================= */
+
+section {
+
+    background: white;
+
+    width: 100%;
+
+    margin: 30px auto;
+
+    padding: 35px;
+
+    border-radius: 25px;
+
+    border: 3px solid #7b1fa2;
+
+    box-shadow:
+        0 15px 35px
+        rgba(0, 0, 0, 0.30);
+
+}
+
+
+/* =========================
+   MENU
+========================= */
+
+.logo {
+
+    text-align: center;
+
+    font-size: 70px;
+
+}
+
+h1 {
+
+    text-align: center;
+
+    color: #6a1b9a;
+
+    font-size: 40px;
+
+    margin-bottom: 10px;
+
+}
+
+h2 {
+
+    color: #1565c0;
+
+    line-height: 1.4;
+
+}
+
+p {
+
+    font-size: 18px;
+
+    line-height: 1.6;
+
+}
+
+.criadores {
+
+    text-align: center;
+
+    color: #7b1fa2;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+}
+
+.descricao {
+
+    text-align: center;
+
+    max-width: 700px;
+
+    margin: 20px auto 30px;
+
+}
+
+#inicio > h2 {
+
+    text-align: center;
+
+}
+
+
+/* =========================
+   CARDS
+========================= */
+
+.cards {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 25px;
+
+}
+
+.card-jogo {
+
+    padding: 28px;
+
+    border-radius: 20px;
+
+    text-align: center;
+
+    border: 3px solid;
+
+    transition: 0.3s;
+
+}
+
+.card-jogo:hover {
+
+    transform: translateY(-7px);
+
+    box-shadow:
+        0 10px 25px
+        rgba(0, 0, 0, 0.20);
+
+}
+
+.bullying {
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffebee,
+            #fce4ec
+        );
+
+    border-color: #c62828;
+
+}
+
+.inclusao {
+
+    background:
+        linear-gradient(
+            135deg,
+            #e3f2fd,
+            #ede7f6
+        );
+
+    border-color: #1565c0;
+
+}
+
+.icone-jogo {
+
+    font-size: 65px;
+
+}
+
+
+/* =========================
+   BOTÕES
+========================= */
+
+button {
+
+    width: 100%;
+
+    padding: 16px;
+
+    margin-top: 15px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            90deg,
+            #6a1b9a,
+            #1565c0
+        );
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+}
+
+button:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 6px 15px
+        rgba(0, 0, 0, 0.25);
+
+}
+
+button:active {
+
+    transform: scale(0.98);
+
+}
+
+
+/* =========================
+   JOGO
+========================= */
+
+.topo-jogo {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 20px;
+
+    font-size: 18px;
+
+}
+
+#numeroPergunta {
+
+    font-weight: bold;
+
+    color: #6a1b9a;
+
+}
+
+#pontuacao {
+
+    font-weight: bold;
+
+    color: #c62828;
+
+}
+
+
+/* =========================
+   BARRA DE PROGRESSO
+========================= */
+
+.barra {
+
+    width: 100%;
+
+    height: 22px;
+
+    background: #ddd;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+
+    margin-bottom: 30px;
+
+}
+
+#progresso {
+
+    width: 0%;
+
+    height: 100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            #c62828,
+            #8e24aa,
+            #1565c0
+        );
+
+    transition:
+        width 0.4s ease;
+
+}
+
+
+/* =========================
+   TÍTULO DO JOGO
+========================= */
+
+#tituloJogo {
+
+    text-align: center;
+
+    color: #7b1fa2;
+
+    margin-bottom: 30px;
+
+}
+
+
+/* =========================
+   CAIXA DA PERGUNTA
+========================= */
+
+.caixa-pergunta {
+
+    background:
+        linear-gradient(
+            135deg,
+            #f5f3fa,
+            #e3f2fd
+        );
+
+    padding: 25px;
+
+    border-radius: 18px;
+
+    border-left: 6px solid #7b1fa2;
+
+    margin-bottom: 25px;
+
+}
+
+.numero-bola {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 42px;
+
+    height: 42px;
+
+    border-radius: 50%;
+
+    color: white;
+
+    background: #7b1fa2;
+
+    font-weight: bold;
+
+    font-size: 20px;
+
+}
+
+#pergunta {
+
+    font-size: 25px;
+
+    color: #263238;
+
+    margin-top: 15px;
+
+    margin-bottom: 0;
+
+}
+
+
+/* =========================
+   ALTERNATIVAS
+========================= */
+
+.alternativa {
+
+    background: #f5f3fa;
+
+    color: #263238;
+
+    border: 2px solid #7b1fa2;
+
+    text-align: left;
+
+    margin: 12px 0;
+
+    transition: 0.2s;
+
+}
+
+.alternativa:hover {
+
+    background: #ede7f6;
+
+    color: #4a148c;
+
+    border-color: #4a148c;
+
+}
+
+.alternativa:disabled {
+
+    cursor: not-allowed;
+
+    opacity: 0.65;
+
+    transform: none;
+
+}
+
+
+/* =========================
+   FEEDBACK
+========================= */
+
+#feedback {
+
+    text-align: center;
+
+    font-weight: bold;
+
+    font-size: 19px;
+
+    min-height: 35px;
+
+    margin-top: 20px;
+
+}
+
+
+/* =========================
+   BOTÃO VOLTAR
+========================= */
+
+.botao-voltar {
+
+    background: #455a64;
+
+    margin-top: 25px;
+
+}
+
+
+/* =========================
+   CONTINUAR
+========================= */
+
+.continuar {
+
+    margin-top: 30px;
+
+    padding: 25px;
+
+    background: #f3e5f5;
+
+    border-radius: 18px;
+
+    border: 2px solid #8e24aa;
+
+    text-align: center;
+
+}
+
+.continuar h3 {
+
+    color: #6a1b9a;
+
+    font-size: 22px;
+
+}
+
+.botao-apagar {
+
+    background: #c62828;
+
+}
+
+
+/* =========================
+   RESULTADO
+========================= */
+
+#resultado {
+
+    text-align: center;
+
+    border-color: #f9a825;
+
+}
+
+.trofeu {
+
+    font-size: 80px;
+
+}
+
+#resultadoTitulo {
+
+    color: #6a1b9a;
+
+}
+
+.resultado-box {
+
+    background:
+        linear-gradient(
+            135deg,
+            #ede7f6,
+            #e3f2fd
+        );
+
+    padding: 25px;
+
+    border-radius: 20px;
+
+    margin: 25px 0;
+
+}
+
+#pontuacaoFinal {
+
+    font-size: 38px;
+
+    font-weight: bold;
+
+    color: #6a1b9a;
+
+    margin: 5px;
+
+}
+
+#porcentagemFinal {
+
+    font-size: 22px;
+
+    font-weight: bold;
+
+    color: #1565c0;
+
+}
+
+#mensagemFinal {
+
+    font-size: 21px;
+
+    font-weight: bold;
+
+}
+
+.botao-menu {
+
+    background: #455a64;
+
+}
+
+
+/* =========================
+   ESCONDER
+========================= */
+
+.escondido {
+
+    display: none !important;
+
+}
+
+
+/* =========================
+   FOOTER
+========================= */
+
+footer {
+
+    max-width: 1000px;
+
+    margin: 30px auto;
+
+    text-align: center;
+
+    color: white;
+
+}
+
+footer p {
+
+    font-size: 14px;
+
+}
+
+
+/* =========================
+   CELULAR
+========================= */
+
+@media (max-width: 700px) {
+
+    body {
+
+        padding: 10px;
+
+    }
+
+    section {
+
+        padding: 20px;
+
+        margin: 15px auto;
+
+    }
+
+    h1 {
+
+        font-size: 29px;
+
+    }
+
+    .cards {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .topo-jogo {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 10px;
+
+    }
+
+    #pergunta {
+
+        font-size: 21px;
+
+    }
+
+    .icone-jogo {
+
+        font-size: 55px;
+
+    }
+
+}
+
+
+/* =========================
+   ANIMAÇÃO DA TELA INICIAL
+========================= */
+
+#inicio {
+    position: relative;
+    overflow: hidden;
+
+    animation: aparecer 0.8s ease;
+}
+
+@keyframes aparecer {
+
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+
+/* =========================
+   LOGO ANIMADA
+========================= */
+
+.logo {
+
+    animation:
+        flutuar 2.5s ease-in-out infinite;
+
+}
+
+@keyframes flutuar {
+
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-12px);
+    }
+
+}
+
+
+/* =========================
+   TÍTULO ANIMADO
+========================= */
+
+#inicio h1 {
+
+    animation:
+        brilho 2s ease-in-out infinite alternate;
+
+}
+
+@keyframes brilho {
+
+    from {
+        text-shadow:
+            0 0 5px #7b1fa2;
+    }
+
+    to {
+        text-shadow:
+            0 0 20px #7b1fa2,
+            0 0 30px #1565c0;
+    }
+
+}
+
+
+/* =========================
+   STATUS DO JOGO
+========================= */
+
+.status-inicial {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 15px;
+
+    flex-wrap: wrap;
+
+    margin: 25px 0;
+
+}
+
+.status {
+
+    padding: 12px 18px;
+
+    border-radius: 15px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f3e5f5,
+            #e3f2fd
+        );
+
+    border: 2px solid #7b1fa2;
+
+    font-weight: bold;
+
+    transition: 0.3s;
+
+}
+
+.status:hover {
+
+    transform: scale(1.05);
+
+}
+
+
+/* =========================
+   MEDALHAS
+========================= */
+
+.medalhas {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 25px;
+
+    margin: 25px 0;
+
+}
+
+.medalha {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    font-weight: bold;
+
+    font-size: 16px;
+
+    transition: 0.3s;
+
+}
+
+.medalha:first-child {
+    animation: medalha1 2s infinite;
+}
+
+.medalha:nth-child(2) {
+    animation: medalha2 2s infinite;
+}
+
+.medalha:nth-child(3) {
+    animation: medalha3 2s infinite;
+}
+
+.medalha:hover {
+
+    transform: scale(1.2);
+
+}
+
+@keyframes medalha1 {
+
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+
+}
+
+@keyframes medalha2 {
+
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+
+}
+
+@keyframes medalha3 {
+
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-11px);
+    }
+
+}
+
+
+/* =========================
+   BOTÃO DE SOM
+========================= */
+
+.botao-som {
+
+    width: auto;
+
+    display: block;
+
+    margin: 20px auto;
+
+    padding: 10px 20px;
+
+    background: #455a64;
+
+}
+
+
+/* =========================
+   ANIMAÇÃO DOS CARDS
+========================= */
+
+.card-jogo {
+
+    animation:
+        entrarCard 0.8s ease;
+
+}
+
+.card-jogo:nth-child(2) {
+
+    animation-delay: 0.2s;
+
+}
+
+@keyframes entrarCard {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            translateY(40px);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0);
+
+    }
+
+}
+
+
+/* =========================
+   CELULAR
+========================= */
+
+@media (max-width: 700px) {
+
+    .status-inicial {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+    }
+
+    .status {
+
+        text-align: center;
+
+    }
+
+    .medalhas {
+
+        gap: 18px;
+
+    }
+
+}

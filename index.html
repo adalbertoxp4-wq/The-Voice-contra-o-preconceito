@@ -1,268 +1,230 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>The Voice Contra o Bullying</title>
-
+    <title>Juntos Contra o Preconceito</title>
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-    <main>
+<main>
 
-        <!-- =========================
-             MENU PRINCIPAL
-        ========================== -->
+    <!-- ================= TELA INICIAL ================= -->
+    <section id="inicio">
 
-        <section id="inicio">
+        <div class="logo">🤝</div>
 
-            <div class="logo">🤝</div>
+        <h1>Juntos Contra o Preconceito</h1>
 
-            <h1>The Voice Contra o Bullying</h1>
-
-            <p class="criadores">
-                👨‍💻 Criadores: Adalberto Alves, Eloá Dama e Noelly Veloso
-            </p>
-
-            <p class="descricao">
-                Um jogo educativo para aprender sobre respeito,
-                empatia, inclusão e convivência.
-            </p>
-
-
-
-
-<div class="medalhas">
-
-    <div class="medalha">
-        🥉
-        <span>Bronze</span>
-    </div>
-
-    <div class="medalha">
-        🥈
-        <span>Prata</span>
-    </div>
-
-    <div class="medalha">
-        🥇
-        <span>Ouro</span>
-    </div>
-
-</div>
-
-
-</button>
-
-
-
-
-
-
-            <h2>🎮 Escolha sua missão</h2>
-
-            <div class="cards">
-
-                <!-- JOGO 1 -->
-
-                <div class="card-jogo bullying">
-
-                    <div class="icone-jogo">
-                        🛡️
-                    </div>
-
-                    <h2>A Luta Contra o Bullying</h2>
-
-                    <p>
-                        Enfrente 100 situações sobre bullying,
-                        cyberbullying, humilhação, exclusão
-                        e respeito.
-                    </p>
-
-                    <button onclick="selecionarJogo('bullying')">
-                        🛡️ Jogar Bullying
-                    </button>
-
-                </div>
-
-
-                <!-- JOGO 2 -->
-
-                <div class="card-jogo inclusao">
-
-                    <div class="icone-jogo">
-                        ♿
-                    </div>
-
-                    <h2>Respeito às Diferenças</h2>
-
-                    <p>
-                        Enfrente 100 situações sobre inclusão,
-                        deficiência, autismo, idosos,
-                        acessibilidade e respeito.
-                    </p>
-
-                    <button onclick="selecionarJogo('inclusao')">
-                        ♿ Jogar Inclusão
-                    </button>
-
-                </div>
-
-            </div>
-
-            <!-- CONTINUAR JOGO -->
-
-            <div id="continuarArea" class="continuar escondido">
-
-                <h3>💾 Você tem um jogo salvo!</h3>
-
-                <p id="jogoSalvoTexto"></p>
-
-                <button onclick="continuarJogo()">
-                    ▶️ Continuar jogo
-                </button>
-
-                <button
-                    class="botao-apagar"
-                    onclick="apagarProgresso()">
-                    🗑️ Apagar progresso
-                </button>
-
-            </div>
-
-        </section>
-
-
-        <!-- =========================
-             ÁREA DO JOGO
-        ========================== -->
-
-        <section id="jogo" class="escondido">
-
-            <div class="topo-jogo">
-
-                <span id="numeroPergunta">
-                    Pergunta 1 de 100
-                </span>
-
-                <span id="pontuacao">
-                    Pontos: 0
-                </span>
-
-            </div>
-
-
-            <!-- BARRA DE PROGRESSO -->
-
-            <div class="barra">
-
-                <div id="progresso"></div>
-
-            </div>
-
-
-            <h2 id="tituloJogo"></h2>
-
-            <div class="caixa-pergunta">
-
-                <span class="numero-bola">
-                    ?
-                </span>
-
-                <h2 id="pergunta"></h2>
-
-            </div>
-
-
-            <!-- ALTERNATIVAS -->
-
-            <div id="alternativas"></div>
-
-
-            <!-- FEEDBACK -->
-
-            <div id="feedback"></div>
-
-
-            <!-- BOTÃO PRÓXIMA -->
-
-            <div id="areaProxima"></div>
-
-
-            <!-- VOLTAR -->
-
-            <button
-                id="salvarSair"
-                class="botao-voltar"
-                onclick="salvarESair()">
-
-                💾 Salvar e voltar ao menu
-
-            </button>
-
-        </section>
-
-
-        <!-- =========================
-             RESULTADO
-        ========================== -->
-
-        <section id="resultado" class="escondido">
-
-            <div class="trofeu">
-                🏆
-            </div>
-
-            <h1>Resultado Final</h1>
-
-            <h2 id="resultadoTitulo"></h2>
-
-            <div class="resultado-box">
-
-                <p id="pontuacaoFinal"></p>
-
-                <p id="porcentagemFinal"></p>
-
-            </div>
-
-            <p id="mensagemFinal"></p>
-
-            <button onclick="jogarNovamente()">
-                🔄 Jogar novamente
-            </button>
-
-            <button
-                class="botao-menu"
-                onclick="voltarAoMenu()">
-
-                🏠 Voltar ao menu
-
-            </button>
-
-        </section>
-
-    </main>
-
-
-    <footer>
-
-        <p>
-            🤝 Juntos contra o preconceito
+        <p class="criadores">
+            👨‍💻 Adalberto Alves, Eloá Dama e Noelly Veloso
         </p>
 
-        <p>
-            Projeto educativo — Adalberto Alves, Eloá Dama e Noelly Veloso
+        <p class="descricao">
+            Um jogo educativo sobre respeito, empatia, inclusão,
+            bullying e convivência.
         </p>
 
-    </footer>
+        <div class="status-inicial">
+            <div class="status">🎮 <span>2 jogos</span></div>
+            <div class="status">🏁 <span>15 fases</span></div>
+            <div class="status">❓ <span>150 perguntas por jogo</span></div>
+            <div class="status">📚 <span>300 perguntas</span></div>
+        </div>
+
+        <div class="medalhas">
+            <div class="medalha">🥉<span>Bronze</span></div>
+            <div class="medalha">🥈<span>Prata</span></div>
+            <div class="medalha">🥇<span>Ouro</span></div>
+        </div>
+
+        <div class="acoes-inicio">
+            <button class="botao-som" onclick="alternarSom()">🔊 Som ativado</button>
+            <button class="botao-ranking" onclick="mostrarRanking()">🏆 Ranking</button>
+        </div>
+
+        <h2>🎮 Escolha sua missão</h2>
+
+        <div class="cards">
+
+            <div class="card-jogo bullying">
+                <div class="icone-jogo">🛡️</div>
+
+                <h2>A Luta Contra o Bullying</h2>
+
+                <p>
+                    Enfrente 15 fases com 10 perguntas em cada fase.
+                    Aprenda sobre bullying, cyberbullying, respeito,
+                    empatia, exclusão e convivência.
+                </p>
+
+                <div class="info-card">
+                    <span>🏁 15 fases</span>
+                    <span>❓ 150 questões</span>
+                </div>
+
+                <button onclick="selecionarJogo('bullying')">
+                    🛡️ Jogar Bullying
+                </button>
+            </div>
+
+            <div class="card-jogo inclusao">
+                <div class="icone-jogo">♿</div>
+
+                <h2>Respeito às Diferenças</h2>
+
+                <p>
+                    Enfrente 15 fases com 10 perguntas em cada fase.
+                    Aprenda sobre inclusão, deficiência, autismo,
+                    acessibilidade, idosos e respeito.
+                </p>
+
+                <div class="info-card">
+                    <span>🏁 15 fases</span>
+                    <span>❓ 150 questões</span>
+                </div>
+
+                <button onclick="selecionarJogo('inclusao')">
+                    ♿ Jogar Inclusão
+                </button>
+            </div>
+
+        </div>
+
+        <div id="continuarArea" class="continuar escondido">
+            <h3>💾 Jogo salvo</h3>
+            <p id="jogoSalvoTexto"></p>
+
+            <button onclick="continuarJogo()">▶️ Continuar</button>
+
+            <button class="botao-apagar" onclick="apagarProgresso()">
+                🗑️ Apagar progresso
+            </button>
+        </div>
+
+    </section>
 
 
-    <script src="script.js"></script>
+    <!-- ================= RANKING ================= -->
+    <section id="rankingTela" class="escondido">
+
+        <h1>🏆 Ranking</h1>
+
+        <p class="centralizado">
+            Veja suas melhores pontuações neste dispositivo.
+        </p>
+
+        <div id="rankingLista"></div>
+
+        <button onclick="fecharRanking()">
+            🏠 Voltar
+        </button>
+
+    </section>
+
+
+    <!-- ================= JOGO ================= -->
+    <section id="jogo" class="escondido">
+
+        <div class="topo-jogo">
+
+            <span id="faseAtual">🏁 Fase 1 de 15</span>
+
+            <span id="numeroPergunta">
+                Pergunta 1 de 10
+            </span>
+
+            <span id="pontuacao">
+                ⭐ Pontos: 0
+            </span>
+
+        </div>
+
+        <div class="barra-fase">
+            <div id="progressoFase"></div>
+        </div>
+
+        <p id="progressoTexto" class="centralizado">
+            Fase 1 — 0 de 10 respondidas
+        </p>
+
+        <h2 id="tituloJogo"></h2>
+
+        <div class="caixa-pergunta">
+
+            <span class="numero-bola" id="numeroBola">
+                1
+            </span>
+
+            <h2 id="pergunta"></h2>
+
+        </div>
+
+        <div id="alternativas"></div>
+
+        <div id="feedback"></div>
+
+        <div id="areaProxima"></div>
+
+        <button
+            id="salvarSair"
+            class="botao-voltar"
+            onclick="salvarESair()">
+
+            💾 Salvar e voltar ao menu
+
+        </button>
+
+    </section>
+
+
+    <!-- ================= RESULTADO ================= -->
+    <section id="resultado" class="escondido">
+
+        <div class="trofeu">🏆</div>
+
+        <h1>Resultado Final</h1>
+
+        <h2 id="resultadoTitulo"></h2>
+
+        <div class="resultado-box">
+
+            <p id="pontuacaoFinal"></p>
+
+            <p id="porcentagemFinal"></p>
+
+            <p id="medalhaFinal"></p>
+
+        </div>
+
+        <p id="mensagemFinal"></p>
+
+        <button onclick="jogarNovamente()">
+            🔄 Jogar novamente
+        </button>
+
+        <button class="botao-menu" onclick="voltarAoMenu()">
+            🏠 Voltar ao menu
+        </button>
+
+    </section>
+
+</main>
+
+
+<footer>
+
+    <p>🤝 Juntos contra o preconceito</p>
+
+    <p>
+        Projeto educativo — Adalberto Alves,
+        Eloá Dama e Noelly Veloso
+    </p>
+
+</footer>
+
+<script src="script.js"></script>
 
 </body>
-
 </html>

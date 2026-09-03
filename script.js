@@ -1,8 +1,8 @@
-// ======================================================
+// ============================================================
 // JUNTOS CONTRA O BULLYING
-// 2 jogos | 150 perguntas por jogo | 4 alternativas
-// Perguntas novas | dificuldade progressiva | salvamento separado
-// ======================================================
+// 2 jogos | 150 perguntas cada | 300 perguntas no total
+// 4 alternativas | dificuldade progressiva | salvamento separado
+// ============================================================
 
 const TOTAL_PERGUNTAS = 150;
 const PERGUNTAS_POR_FASE = 10;
@@ -16,11 +16,11 @@ let respostaDada = false;
 let somAtivo = true;
 let audioContext = null;
 
-// ------------------------------------------------------
+// ------------------------------------------------------------
 // Utilidades
-// ------------------------------------------------------
-function embaralhar(lista) {
-    const copia = [...lista];
+// ------------------------------------------------------------
+function embaralhar(array) {
+    const copia = [...array];
     for (let i = copia.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [copia[i], copia[j]] = [copia[j], copia[i]];
@@ -28,199 +28,894 @@ function embaralhar(lista) {
     return copia;
 }
 
-function pontosDaPergunta(indice) {
-    if (indice < 30) return 10;
-    if (indice < 60) return 15;
-    if (indice < 90) return 20;
-    if (indice < 120) return 25;
-    return 30;
+function escolherTresUnicas(lista, inicio) {
+    const resultado = [];
+    for (let i = 0; resultado.length < 3 && i < lista.length * 2; i++) {
+        const item = lista[(inicio + i) % lista.length];
+        if (!resultado.includes(item)) resultado.push(item);
+    }
+    return resultado;
 }
 
-function nivelDaPergunta(indice) {
-    if (indice < 30) return "Iniciante";
-    if (indice < 60) return "Fácil";
-    if (indice < 90) return "Intermediário";
-    if (indice < 120) return "Difícil";
-    return "Muito difícil";
-}
+const niveis = [
+    { nome: "🟢 Iniciante", pontos: 10 },
+    { nome: "🟡 Fácil", pontos: 12 },
+    { nome: "🟠 Intermediário", pontos: 15 },
+    { nome: "🔴 Difícil", pontos: 20 },
+    { nome: "🟣 Desafio máximo", pontos: 25 }
+];
 
-// ------------------------------------------------------
-// BANCO NOVO — BULLYING
-// 30 temas x 5 situações = 150 perguntas
-// ------------------------------------------------------
+// ============================================================
+// BANCO 1 — A LUTA CONTRA O BULLYING
+// 30 temas x 5 perguntas = 150 perguntas NOVAS
+// ============================================================
+
 const bancoBullying = [
-    ["apelidos", "Um colega pede que você pare de usar um apelido que o incomoda. O que demonstra respeito?", "Parar de usar o apelido e chamá-lo pelo nome que prefere.", "Continuar porque os outros colegas acham engraçado.", "Criar outro apelido para substituir o primeiro.", "Dizer que ele precisa aprender a aceitar brincadeiras."],
-    ["exclusão", "Durante um trabalho em grupo, um aluno está sendo deixado de fora de propósito. Qual atitude ajuda?", "Garantir que ele possa participar e dividir as tarefas de forma justa.", "Deixar que o grupo decida quem merece participar.", "Fingir que não percebeu para evitar discussão.", "Dizer que ele deve procurar outro grupo sozinho."],
-    ["cyberbullying", "Você recebe uma mensagem ofensiva sobre um colega em um grupo. Qual é a atitude mais segura?", "Não espalhar a mensagem, guardar a evidência e procurar um responsável.", "Encaminhar a mensagem para outros grupos para mostrar o que aconteceu.", "Responder com uma ofensa ainda mais forte.", "Publicar o nome de quem enviou para expô-lo."],
-    ["testemunha", "Você presencia uma humilhação na escola e percebe que a pessoa ficou abalada. O que pode fazer?", "Apoiar a pessoa e contar o ocorrido a um adulto responsável.", "Filmar a situação para ter conteúdo como prova e postar depois.", "Rir junto para não chamar atenção para si.", "Esperar que a vítima enfrente o agressor sozinha."],
-    ["boato", "Um boato ofensivo sobre um estudante começa a circular. O que é mais responsável?", "Não repassar a história e buscar informação com pessoas responsáveis.", "Compartilhar apenas com amigos próximos.", "Perguntar a várias pessoas para descobrir detalhes pessoais.", "Publicar o boato com a frase 'não sei se é verdade'."],
-    ["empatia", "Um colega demonstra tristeza depois de ser alvo de comentários. Qual reação mostra empatia?", "Ouvir sem debochar e perguntar como você pode ajudar.", "Dizer que ele está exagerando.", "Mudar de assunto para não precisar ouvir.", "Contar uma história parecida para competir com o problema dele."],
-    ["diferenças", "Uma turma faz piadas sobre uma característica física de um aluno. Qual princípio deve orientar sua atitude?", "A característica de alguém não justifica humilhação ou discriminação.", "Piadas são aceitáveis quando muitas pessoas riem.", "A pessoa deve mudar para evitar comentários.", "Só é errado se houver agressão física."],
-    ["respeito", "Duas pessoas discordam durante uma atividade. Como resolver a situação de forma respeitosa?", "Ouvir os dois lados e discutir as ideias sem atacar as pessoas.", "Escolher o lado de quem fala mais alto.", "Usar apelidos para mostrar quem está errado.", "Encerrar a conversa humilhando o colega."],
-    ["ajuda", "Um estudante diz que está com medo de ir à escola por causa de provocações repetidas. O que fazer?", "Levar a situação a um adulto de confiança e oferecer apoio.", "Dizer para ele faltar até o problema desaparecer.", "Sugerir que ele reaja com a mesma agressividade.", "Guardar segredo mesmo que ele esteja em risco."],
-    ["brincadeira", "Uma pessoa diz que uma brincadeira está machucando seus sentimentos. O que deve acontecer?", "A brincadeira deve parar e o desconforto deve ser respeitado.", "Continuar porque a intenção era apenas divertir.", "Perguntar aos espectadores se eles acharam engraçado.", "Dizer que quem se incomodou não sabe brincar."],
-    ["rede social", "Antes de comentar uma publicação de um colega, qual cuidado ajuda a evitar conflitos?", "Pensar no impacto do comentário e manter uma linguagem respeitosa.", "Escrever rapidamente antes que outra pessoa comente.", "Usar ironia porque ela parece menos agressiva.", "Publicar algo provocativo para aumentar as interações."],
-    ["grupo", "Em um grupo de mensagens, alguém começa a atacar repetidamente uma pessoa. O que um participante responsável pode fazer?", "Não participar dos ataques e procurar ajuda se a situação continuar.", "Curtir as mensagens para mostrar que concorda.", "Adicionar mais pessoas para aumentar a pressão.", "Responder com ataques contra o agressor."],
-    ["autoridade", "Ao relatar um caso de bullying, por que é importante procurar um adulto responsável?", "Porque adultos podem ajudar a proteger os envolvidos e encaminhar a situação.", "Porque somente adultos podem decidir quem está certo em qualquer discussão.", "Porque conversar com colegas nunca ajuda em nenhuma situação.", "Porque a vítima não deve participar de nenhuma decisão."],
-    ["segurança", "Se uma situação de bullying estiver ficando fisicamente perigosa, qual prioridade vem primeiro?", "Afastar-se do perigo e procurar ajuda imediatamente.", "Tentar vencer a briga para provar coragem.", "Filmar a situação antes de procurar ajuda.", "Pedir que os colegas formem uma torcida."],
-    ["responsabilidade", "Por que quem presencia bullying também pode ter um papel importante?", "Porque pode evitar o incentivo à agressão e ajudar a vítima a buscar apoio.", "Porque a testemunha deve resolver tudo sozinha.", "Porque quem assiste sempre deve enfrentar fisicamente o agressor.", "Porque é responsabilidade da testemunha escolher um lado e atacar o outro."],
-    ["privacidade", "Você recebe uma imagem constrangedora de um colega. O que fazer?", "Não compartilhar e procurar ajuda se a imagem estiver sendo usada para humilhar.", "Enviar para poucos amigos de confiança.", "Publicar sem marcar a pessoa.", "Guardar para usar contra ela no futuro."],
-    ["humilhação", "Uma pessoa é ridicularizada diante da turma. Qual atitude ajuda a reduzir o dano?", "Evitar participar da humilhação e oferecer apoio de maneira respeitosa.", "Rir para não parecer diferente dos demais.", "Perguntar detalhes na frente de todos.", "Dizer que a pessoa precisa aprender a lidar com críticas."],
-    ["repetição", "Por que provocações repetidas merecem atenção mesmo quando não deixam marcas físicas?", "Porque agressões emocionais e sociais também podem causar sofrimento e prejudicar a convivência.", "Porque toda conversa difícil é automaticamente bullying.", "Porque qualquer brincadeira entre amigos deve ser proibida.", "Porque somente agressões físicas podem ser avaliadas por adultos."],
-    ["comunicação", "Qual é uma boa forma de falar com alguém que foi alvo de uma agressão?", "Falar em particular, ouvir e oferecer apoio sem culpabilizar a pessoa.", "Perguntar na frente da turma o que aconteceu.", "Exigir que ela conte todos os detalhes imediatamente.", "Dizer que ela deveria ter reagido de outra maneira."],
-    ["prevenção", "Qual ação pode contribuir para prevenir bullying em uma escola?", "Criar regras claras, incentivar o respeito e facilitar canais seguros de ajuda.", "Evitar falar sobre o tema para não chamar atenção.", "Punir todos os estudantes quando ocorrer qualquer conflito.", "Deixar cada turma resolver casos graves por conta própria."],
-    ["conflito", "Uma discussão isolada acontece entre dois colegas. Qual é uma diferença importante em relação ao bullying?", "É preciso observar contexto, repetição, relações de poder e impactos antes de concluir o que ocorreu.", "Toda discussão entre duas pessoas é bullying.", "Bullying só existe quando há agressão física.", "Se duas pessoas discutiram, nenhuma delas pode pedir ajuda."],
-    ["poder", "Por que a diferença de poder pode ser relevante em situações de bullying?", "Porque pode dificultar que a pessoa alvo consiga se defender ou interromper a situação.", "Porque a pessoa com mais amigos sempre está certa.", "Porque quem tem mais força física nunca precisa de orientação.", "Porque toda diferença entre colegas significa que existe bullying."],
-    ["adulto", "Um estudante pede para você não contar a ninguém que está sofrendo agressões, mas parece estar em perigo. O que fazer?", "Buscar um adulto responsável para proteger o estudante, mesmo que a situação exija cuidado ao preservar sua privacidade.", "Prometer segredo em qualquer circunstância.", "Publicar o caso para conseguir ajuda rapidamente.", "Mandar o estudante resolver sozinho."],
-    ["culpa", "Qual frase é mais adequada para alguém que sofreu bullying?", "A responsabilidade pela agressão não é da vítima; ela merece apoio e proteção.", "Você deveria ter evitado chamar atenção.", "Se você ficou triste, talvez tenha entendido errado.", "É melhor mudar seu jeito para não ser alvo novamente."],
-    ["denúncia", "Ao comunicar um caso, quais informações podem ajudar um adulto a entender a situação?", "O que aconteceu, quando ocorreu, quem estava envolvido e quais evidências existem.", "Somente a opinião de quem contou primeiro.", "Comentários exagerados para fazer o caso parecer maior.", "O máximo possível de informações pessoais da vítima."],
-    ["digital", "Qual atitude reduz a chance de uma publicação ofensiva ganhar alcance?", "Não compartilhar, não incentivar interações ofensivas e usar os recursos de denúncia da plataforma.", "Comentar para discutir com o agressor publicamente.", "Compartilhar em outro perfil para pedir opiniões.", "Responder com outra publicação ofensiva."],
-    ["amizade", "Um amigo começa a praticar humilhações contra outro aluno. Como agir com responsabilidade?", "Conversar sobre o comportamento, não apoiar a agressão e buscar ajuda quando necessário.", "Defender o amigo em qualquer situação.", "Rir junto para preservar a amizade.", "Esconder o comportamento para evitar problemas."],
-    ["influência", "Por que a reação dos espectadores pode influenciar uma situação de bullying?", "A aprovação ou o silêncio do grupo pode reforçar o comportamento de quem agride.", "Porque espectadores sempre são os responsáveis pelo bullying.", "Porque qualquer pessoa que assista precisa confrontar fisicamente o agressor.", "Porque somente quem assiste consegue resolver a situação."],
-    ["restauração", "Depois de um caso de bullying, por que a escola pode precisar acompanhar os envolvidos por algum tempo?", "Porque reconstruir segurança e convivência pode exigir acompanhamento e ações contínuas.", "Porque o problema sempre desaparece depois de uma conversa.", "Porque a vítima deve explicar o caso repetidamente.", "Porque a escola deve expor publicamente todos os envolvidos."],
-    ["cultura", "Qual ambiente escolar favorece a prevenção de bullying?", "Um ambiente com respeito, participação, regras claras e canais seguros para pedir ajuda.", "Um ambiente em que conflitos são escondidos para preservar a imagem da escola.", "Um ambiente em que alunos mais populares definem as regras sociais.", "Um ambiente em que pedir ajuda é visto como fraqueza."]
+    {
+        tema: "um colega sendo alvo de apelidos ofensivos",
+        correta: "Interromper a normalização da ofensa, apoiar o colega e procurar um adulto responsável.",
+        erradas: [
+            "Rir junto para mostrar que você faz parte do grupo.",
+            "Dizer que ele precisa aceitar porque apelidos fazem parte da escola.",
+            "Inventar outro apelido para equilibrar a brincadeira.",
+            "Esperar a situação ficar mais grave antes de agir.",
+            "Gravar a reação do colega e enviar para outros estudantes.",
+            "Pedir que a pessoa ofendida não conte nada para evitar confusão."
+        ]
+    },
+    {
+        tema: "uma postagem humilhante sobre um estudante",
+        correta: "Não compartilhar, preservar as evidências e comunicar a situação a alguém de confiança.",
+        erradas: [
+            "Compartilhar a postagem para mostrar aos amigos o que aconteceu.",
+            "Responder com outra publicação ainda mais agressiva.",
+            "Comentar usando emojis de risada para não chamar atenção.",
+            "Apagar tudo imediatamente sem guardar nenhuma evidência.",
+            "Criar uma enquete para descobrir quem concorda com a humilhação.",
+            "Marcar mais colegas para que todos saibam do caso."
+        ]
+    },
+    {
+        tema: "um aluno sendo deixado de fora repetidamente de atividades",
+        correta: "Criar oportunidades reais de participação e investigar por que a exclusão está acontecendo.",
+        erradas: [
+            "Aceitar a exclusão porque o grupo já está formado.",
+            "Dizer que a pessoa deve procurar outro grupo sozinha.",
+            "Convidá-la apenas quando não houver outra opção.",
+            "Fazer piada sobre ela estar sempre sozinha.",
+            "Ignorar porque ninguém encostou fisicamente nela.",
+            "Usar a exclusão como forma de ensinar uma lição."
+        ]
+    },
+    {
+        tema: "uma brincadeira que deixa sempre a mesma pessoa constrangida",
+        correta: "Perceber o desconforto, parar a brincadeira e respeitar o limite da pessoa.",
+        erradas: [
+            "Continuar enquanto a maioria estiver se divertindo.",
+            "Dizer que só é brincadeira se a pessoa não reclamar.",
+            "Pedir que ela aprenda a não levar as coisas a sério.",
+            "Aumentar a intensidade da brincadeira para testar o limite.",
+            "Perguntar aos outros se podem continuar sem consultar a pessoa.",
+            "Transformar a reação dela em motivo para uma nova piada."
+        ]
+    },
+    {
+        tema: "um conflito entre colegas que está começando a virar perseguição",
+        correta: "Buscar ajuda antes que o conflito se transforme em agressões repetidas ou intimidação.",
+        erradas: [
+            "Incentivar os colegas a escolher um lado e atacar o outro.",
+            "Resolver tudo por meio de uma discussão pública.",
+            "Espalhar a história para conseguir apoio contra uma pessoa.",
+            "Aguardar até alguém se machucar para procurar ajuda.",
+            "Criar uma competição para decidir quem está certo.",
+            "Filmar a discussão e publicar para receber opiniões."
+        ]
+    },
+    {
+        tema: "um estudante recebendo mensagens agressivas à noite",
+        correta: "Bloquear quando necessário, guardar as mensagens e buscar apoio de um adulto de confiança.",
+        erradas: [
+            "Responder imediatamente com ameaças equivalentes.",
+            "Criar uma conta falsa para atacar o agressor.",
+            "Publicar o número da pessoa para que outros respondam.",
+            "Apagar as mensagens e fingir que nada aconteceu.",
+            "Aceitar todas as provocações para tentar acabar com elas.",
+            "Enviar as mensagens para vários grupos apenas por curiosidade."
+        ]
+    },
+    {
+        tema: "um grupo fazendo piadas sobre a aparência de uma colega",
+        correta: "Não participar da humilhação e reforçar que aparência não justifica desrespeito.",
+        erradas: [
+            "Escolher uma característica diferente para fazer outra piada.",
+            "Rir sem comentar para não parecer contrário ao grupo.",
+            "Perguntar se a colega tem senso de humor antes de continuar.",
+            "Dizer que críticas sobre aparência ajudam a pessoa a melhorar.",
+            "Publicar uma foto dela para aumentar a brincadeira.",
+            "Pedir que façam as piadas somente quando ela não estiver presente."
+        ]
+    },
+    {
+        tema: "um estudante sendo provocado por sua forma de falar",
+        correta: "Respeitar a maneira de falar e evitar transformar sotaque ou voz em motivo de humilhação.",
+        erradas: [
+            "Imitar a fala para deixar o ambiente mais engraçado.",
+            "Corrigir a pessoa publicamente sempre que ela falar.",
+            "Dizer que ela deve mudar para ser aceita.",
+            "Criar um apelido baseado no sotaque.",
+            "Gravar a fala e compartilhar com colegas.",
+            "Pedir que a pessoa fale menos para não chamar atenção."
+        ]
+    },
+    {
+        tema: "um colega sendo alvo de rumores",
+        correta: "Não espalhar a informação sem confirmação e procurar orientação se o rumor estiver causando dano.",
+        erradas: [
+            "Repassar o rumor somente para pessoas de confiança.",
+            "Adicionar detalhes para deixar a história mais interessante.",
+            "Perguntar a várias pessoas até descobrir quem começou.",
+            "Publicar uma enquete para saber se o rumor é verdadeiro.",
+            "Tratar o rumor como verdade porque muitas pessoas comentaram.",
+            "Usar o rumor para convencer outros colegas a se afastarem."
+        ]
+    },
+    {
+        tema: "uma vítima dizendo que tem medo de ir para a escola",
+        correta: "Levar o relato a sério, oferecer apoio e procurar imediatamente um adulto responsável.",
+        erradas: [
+            "Dizer que ela precisa ser mais forte e enfrentar sozinha.",
+            "Mandá-la ignorar os colegas por alguns dias.",
+            "Contar a história para toda a turma para pedir opiniões.",
+            "Dizer que faltar à escola resolverá o problema definitivamente.",
+            "Prometer vingança contra quem a intimidou.",
+            "Pedir que ela volte ao local sem qualquer acompanhamento."
+        ]
+    },
+    {
+        tema: "uma testemunha vendo uma agressão no corredor",
+        correta: "Priorizar a segurança, não incentivar a agressão e chamar um adulto responsável.",
+        erradas: [
+            "Entrar na confusão sem avaliar a segurança de ninguém.",
+            "Filmar a agressão para usar como entretenimento.",
+            "Gritar para que os envolvidos continuem.",
+            "Chamar outros estudantes para assistir.",
+            "Publicar o vídeo depois para denunciar a situação.",
+            "Ignorar completamente porque não foi diretamente atingida."
+        ]
+    },
+    {
+        tema: "um aluno novo sendo constantemente ignorado",
+        correta: "Apresentá-lo aos colegas, incluí-lo nas atividades e evitar que o isolamento vire rotina.",
+        erradas: [
+            "Esperar que ele faça todos os contatos sozinho.",
+            "Convidá-lo apenas para tarefas que ninguém quer fazer.",
+            "Dizer que ele deve se adaptar sem receber ajuda.",
+            "Fazer perguntas pessoais na frente de toda a turma.",
+            "Usar a falta de amigos como motivo de brincadeira.",
+            "Manter a separação para não alterar os grupos existentes."
+        ]
+    },
+    {
+        tema: "um colega sendo provocado por sua condição financeira",
+        correta: "Evitar comentários sobre dinheiro e tratar todos com dignidade, independentemente da condição econômica.",
+        erradas: [
+            "Perguntar publicamente quanto a família ganha.",
+            "Fazer piadas sobre roupas ou objetos usados.",
+            "Excluir a pessoa de atividades por não poder pagar.",
+            "Usar comparações de preço para decidir quem merece respeito.",
+            "Pedir que ela esconda seus objetos para não virar alvo.",
+            "Considerar a situação financeira uma justificativa para apelidos."
+        ]
+    },
+    {
+        tema: "um colega sendo ridicularizado por seu peso",
+        correta: "Interromper a humilhação e tratar o corpo da pessoa com respeito, sem comentários ofensivos.",
+        erradas: [
+            "Dizer que a piada ajuda a pessoa a emagrecer.",
+            "Comparar o corpo dela com o de outros estudantes.",
+            "Sugerir dietas na frente de todo mundo.",
+            "Usar um apelido ligado ao peso.",
+            "Fotografar a pessoa para mostrar aos amigos.",
+            "Dizer que ela deve ignorar porque é apenas humor."
+        ]
+    },
+    {
+        tema: "uma pessoa sendo discriminada por sua religião",
+        correta: "Respeitar a liberdade de crença e não transformar a religião de alguém em motivo de ataque.",
+        erradas: [
+            "Fazer piadas com símbolos religiosos.",
+            "Dizer que somente uma crença merece respeito.",
+            "Pressionar a pessoa a esconder sua religião.",
+            "Usar estereótipos para explicar como ela é.",
+            "Excluir a pessoa de atividades por causa da crença.",
+            "Questionar a fé dela de maneira humilhante diante da turma."
+        ]
+    },
+    {
+        tema: "uma pessoa sendo atacada por causa de sua origem regional",
+        correta: "Valorizar a diversidade regional e não usar sotaque, origem ou costumes para humilhar.",
+        erradas: [
+            "Imitar o sotaque para conseguir risadas.",
+            "Dizer que uma região é inferior às outras.",
+            "Criar apelidos baseados no lugar onde a pessoa nasceu.",
+            "Evitar a pessoa porque seus costumes são diferentes.",
+            "Tratar estereótipos regionais como fatos sobre todos.",
+            "Pedir que ela esconda sua origem para evitar comentários."
+        ]
+    },
+    {
+        tema: "um grupo planejando excluir alguém de um grupo de mensagens",
+        correta: "Avaliar se a exclusão é uma forma de perseguição e evitar usar o grupo para humilhar a pessoa.",
+        erradas: [
+            "Criar outro grupo secreto para falar mal dela.",
+            "Excluir a pessoa e comemorar a decisão.",
+            "Adicionar mais pessoas para fortalecer a exclusão.",
+            "Inventar uma justificativa para parecer que ninguém teve culpa.",
+            "Publicar capturas de tela para ridicularizá-la.",
+            "Dizer que a exclusão digital nunca pode ser prejudicial."
+        ]
+    },
+    {
+        tema: "um colega sendo provocado por tirar notas altas",
+        correta: "Respeitar o desempenho do colega e evitar transformar sucesso acadêmico em motivo de hostilidade.",
+        erradas: [
+            "Chamá-lo de nomes para diminuir seu desempenho.",
+            "Esconder materiais dele para prejudicar suas notas.",
+            "Espalhar que ele só consegue boas notas porque recebe ajuda.",
+            "Pedir que ele erre de propósito para não se destacar.",
+            "Excluir o colega dos trabalhos por ser considerado competitivo.",
+            "Fazer piadas sempre que ele receber uma nota alta."
+        ]
+    },
+    {
+        tema: "uma pessoa sendo humilhada por cometer um erro em público",
+        correta: "Evitar a exposição, tratar o erro com respeito e ajudar a pessoa a corrigir o que aconteceu.",
+        erradas: [
+            "Repetir o erro para que todos riam novamente.",
+            "Publicar a falha como meme.",
+            "Dizer que o erro prova que a pessoa é incapaz.",
+            "Usar o erro para criar um apelido permanente.",
+            "Lembrar o erro em toda conversa futura.",
+            "Impedir que a pessoa participe novamente para evitar novos erros."
+        ]
+    },
+    {
+        tema: "um estudante recebendo comentários ofensivos em uma rede social",
+        correta: "Evitar o confronto agressivo, registrar os comentários e utilizar as ferramentas de denúncia e bloqueio.",
+        erradas: [
+            "Criar uma campanha de ataques contra o autor.",
+            "Compartilhar o perfil do agressor para receber ameaças.",
+            "Responder a cada comentário com uma ofensa.",
+            "Publicar dados pessoais do agressor.",
+            "Criar contas falsas para continuar a discussão.",
+            "Dizer que ataques virtuais não têm consequências."
+        ]
+    },
+    {
+        tema: "uma pessoa dizendo que não quer participar de uma brincadeira",
+        correta: "Respeitar a recusa sem pressionar, ridicularizar ou insistir.",
+        erradas: [
+            "Continuar insistindo até ela aceitar.",
+            "Chamá-la de antissocial por recusar.",
+            "Fazer a brincadeira escondido para surpreendê-la.",
+            "Dizer que recusar prova falta de coragem.",
+            "Convencer outras pessoas a pressioná-la.",
+            "Transformar a recusa em motivo para um apelido."
+        ]
+    },
+    {
+        tema: "um colega contando que sofre bullying há semanas",
+        correta: "Escutar sem culpá-lo e ajudá-lo a chegar a pessoas responsáveis que possam intervir.",
+        erradas: [
+            "Dizer que ele deveria ter contado antes e encerrar a conversa.",
+            "Prometer resolver o caso sozinho usando violência.",
+            "Contar o relato para colegas que não precisam saber.",
+            "Pedir que ele confronte o grupo sem apoio.",
+            "Questionar se ele fez algo para merecer as agressões.",
+            "Dizer que o problema vai desaparecer se ele ignorar."
+        ]
+    },
+    {
+        tema: "uma turma tentando criar regras de convivência",
+        correta: "Construir regras claras, respeitosas e aplicáveis a todos, ouvindo diferentes necessidades.",
+        erradas: [
+            "Criar regras diferentes para proteger apenas os alunos populares.",
+            "Permitir ofensas quando a maioria estiver brincando.",
+            "Punir sem investigar o que aconteceu.",
+            "Fazer regras apenas contra quem costuma reclamar.",
+            "Evitar qualquer regra para que cada um faça o que quiser.",
+            "Usar apelidos como parte oficial das regras de humor."
+        ]
+    },
+    {
+        tema: "um aluno com medo de denunciar uma agressão",
+        correta: "Oferecer apoio e ajudar a encontrar um canal seguro para comunicar o problema.",
+        erradas: [
+            "Exigir que ele conte tudo na frente da turma.",
+            "Dizer que denunciar é demonstrar fraqueza.",
+            "Prometer segredo absoluto mesmo quando há risco à segurança.",
+            "Mandá-lo enfrentar sozinho quem o ameaça.",
+            "Contar a história para amigos antes de procurar ajuda.",
+            "Ignorar o medo porque a denúncia é responsabilidade exclusiva da vítima."
+        ]
+    },
+    {
+        tema: "um estudante sendo alvo de montagem com sua foto",
+        correta: "Não divulgar a montagem, guardar evidências e buscar ajuda para interromper a exposição.",
+        erradas: [
+            "Compartilhar a montagem apenas com amigos próximos.",
+            "Criar uma montagem semelhante contra outra pessoa.",
+            "Comentar para aumentar o alcance da publicação.",
+            "Marcar a vítima para que ela veja a brincadeira.",
+            "Dizer que uma imagem editada nunca pode causar dano.",
+            "Salvar a imagem somente para usar como piada no futuro."
+        ]
+    },
+    {
+        tema: "um colega sendo perseguido durante o recreio",
+        correta: "Afastar-se de uma situação insegura, buscar um adulto e oferecer apoio à pessoa perseguida.",
+        erradas: [
+            "Correr junto para transformar a perseguição em brincadeira.",
+            "Esconder a vítima para que ninguém precise intervir.",
+            "Ficar assistindo para descobrir como a situação termina.",
+            "Gritar provocações para aumentar a confusão.",
+            "Filmar para provar que o recreio estava movimentado.",
+            "Dizer que perseguição é normal entre adolescentes."
+        ]
+    },
+    {
+        tema: "um grupo usando uma característica pessoal para escolher quem será o próximo alvo",
+        correta: "Recusar a dinâmica e deixar claro que características pessoais não devem ser usadas para humilhar.",
+        erradas: [
+            "Escolher alguém diferente para evitar que você seja alvo.",
+            "Aceitar porque é apenas um jogo entre amigos.",
+            "Fazer uma lista dos estudantes mais fáceis de provocar.",
+            "Permitir a brincadeira desde que ninguém grave.",
+            "Escolher o alvo por votação para parecer democrático.",
+            "Continuar até a pessoa reclamar claramente."
+        ]
+    },
+    {
+        tema: "um estudante sendo pressionado a ofender outra pessoa",
+        correta: "Recusar a pressão e não participar de uma agressão, mesmo que o grupo insista.",
+        erradas: [
+            "Ofender primeiro para evitar ser excluído.",
+            "Aceitar porque a ordem veio de alguém popular.",
+            "Participar apenas uma vez para manter amizades.",
+            "Fazer uma ofensa menor para parecer menos agressivo.",
+            "Pedir que outra pessoa faça a agressão no seu lugar.",
+            "Acreditar que a pressão do grupo elimina sua responsabilidade."
+        ]
+    },
+    {
+        tema: "um colega sendo chamado por um nome que ele já pediu para não usar",
+        correta: "Respeitar o nome pelo qual a pessoa quer ser chamada e corrigir o comportamento dos colegas quando necessário.",
+        erradas: [
+            "Continuar usando porque o apelido é antigo.",
+            "Dizer que ele precisa aceitar o nome escolhido pelos outros.",
+            "Criar uma versão ainda mais engraçada do apelido.",
+            "Usar o nome apenas quando houver professores por perto.",
+            "Perguntar à turma se vale a pena respeitar o pedido.",
+            "Transformar a preferência da pessoa em motivo de provocação."
+        ]
+    },
+    {
+        tema: "uma situação em que o agressor diz que era apenas uma brincadeira",
+        correta: "Avaliar o impacto da conduta, ouvir a pessoa afetada e interromper o comportamento prejudicial.",
+        erradas: [
+            "Encerrar o assunto automaticamente porque houve intenção de brincar.",
+            "Considerar que qualquer coisa vira aceitável se alguém rir.",
+            "Dizer que quem se ofendeu é sempre responsável pelo problema.",
+            "Continuar a brincadeira para testar se a pessoa reclama novamente.",
+            "Perguntar apenas aos espectadores se eles acharam engraçado.",
+            "Ignorar a repetição da conduta porque não houve agressão física."
+        ]
+    },
+    {
+        tema: "uma escola querendo reduzir casos de bullying",
+        correta: "Combinar prevenção, educação para o respeito, canais de denúncia e acompanhamento dos casos.",
+        erradas: [
+            "Agir somente quando um caso aparece nas redes sociais.",
+            "Punir sem ouvir ninguém para acelerar o processo.",
+            "Evitar falar sobre bullying para não dar publicidade ao tema.",
+            "Deixar a responsabilidade exclusivamente com as vítimas.",
+            "Criar uma única palestra e considerar o problema resolvido.",
+            "Tratar todos os conflitos como bullying sem analisar o contexto."
+        ]
+    }
 ];
 
-// ------------------------------------------------------
-// BANCO NOVO — INCLUSÃO E RESPEITO ÀS DIFERENÇAS
-// 30 temas x 5 situações = 150 perguntas
-// ------------------------------------------------------
+// ============================================================
+// BANCO 2 — RESPEITO ÀS DIFERENÇAS
+// 30 temas x 5 perguntas = 150 perguntas NOVAS
+// ============================================================
+
 const bancoInclusao = [
-    ["deficiência", "Uma pessoa com deficiência participa de uma atividade. Qual postura é mais adequada?", "Tratá-la com respeito, sem presumir suas limitações e oferecendo ajuda quando necessário.", "Fazer tudo por ela sem perguntar.", "Evitar convidá-la para atividades difíceis.", "Falar com outra pessoa em vez de falar diretamente com ela."],
-    ["acessibilidade", "Uma escola quer tornar seus espaços mais inclusivos. Qual medida é adequada?", "Garantir acesso aos espaços e recursos necessários para diferentes necessidades.", "Criar uma única entrada acessível e bloquear as demais rotas.", "Esperar que cada aluno resolva sozinho suas dificuldades de acesso.", "Retirar adaptações quando poucas pessoas as utilizarem."],
-    ["capacitismo", "Qual atitude pode revelar capacitismo?", "Julgar que alguém é incapaz apenas por ter uma deficiência.", "Perguntar qual apoio a pessoa prefere.", "Respeitar o ritmo e a autonomia de cada pessoa.", "Adaptar uma atividade quando houver necessidade."],
-    ["autismo", "Um colega autista demonstra uma forma diferente de se comunicar. O que é importante?", "Respeitar sua forma de comunicação e suas necessidades individuais.", "Obrigá-lo a se comunicar exatamente como os demais.", "Imitar seus comportamentos para fazer a turma rir.", "Supor que ele não entende nada sem conversar com ele."],
-    ["cadeira de rodas", "Você precisa passar perto de uma pessoa que usa cadeira de rodas. Qual atitude é correta?", "Respeitar o espaço da cadeira e nunca movimentá-la sem autorização.", "Segurar a cadeira para ajudar sem perguntar.", "Usar a cadeira como apoio para objetos.", "Empurrar a cadeira para abrir caminho."],
-    ["surdez", "Ao conversar com uma pessoa surda, qual atitude é mais respeitosa?", "Perguntar qual forma de comunicação ela prefere e facilitar a comunicação.", "Falar muito alto como se isso resolvesse qualquer dificuldade.", "Falar apenas com o acompanhante.", "Evitar conversar para não cometer erros."],
-    ["cegueira", "Uma pessoa cega precisa encontrar uma sala. Como oferecer ajuda?", "Perguntar se ela quer ajuda e seguir a orientação que ela indicar.", "Puxá-la pelo braço sem avisar.", "Empurrá-la até a sala mais próxima.", "Decidir por ela o caminho sem perguntar."],
-    ["idosos", "Uma pessoa idosa participa de uma decisão. Qual postura demonstra respeito?", "Ouvir sua opinião e respeitar sua autonomia.", "Decidir tudo por ela automaticamente.", "Ignorar sua opinião por causa da idade.", "Falar com ela como se fosse uma criança."],
-    ["equidade", "O que significa agir com equidade em uma atividade escolar?", "Oferecer os apoios necessários para que diferentes pessoas tenham oportunidades justas.", "Dar exatamente o mesmo apoio em qualquer situação.", "Dar vantagens sem considerar nenhuma necessidade.", "Excluir quem precisa de adaptação."],
-    ["diversidade", "Por que a diversidade pode ser positiva em uma turma?", "Porque diferentes experiências e perspectivas podem ampliar a aprendizagem e a convivência.", "Porque todos precisam pensar da mesma maneira.", "Porque diferenças devem ser usadas para separar grupos.", "Porque uma turma diversa não precisa de regras de respeito."],
-    ["linguagem", "Ao falar sobre uma pessoa com deficiência, qual cuidado é importante?", "Usar uma linguagem respeitosa e seguir a forma como a própria pessoa prefere ser identificada.", "Usar apelidos relacionados à deficiência.", "Falar sobre a pessoa como se ela não estivesse presente.", "Escolher termos ofensivos porque parecem engraçados."],
-    ["participação", "Um estudante precisa de uma adaptação para participar de uma atividade. O que a turma deve fazer?", "Buscar uma forma de adaptação que mantenha sua participação e aprendizagem.", "Excluir o estudante da atividade.", "Fazer a atividade por ele.", "Dizer que adaptações são privilégios injustos."],
-    ["barreiras", "O que pode ser uma barreira à inclusão?", "Uma regra, espaço ou atitude que dificulta desnecessariamente a participação de alguém.", "Uma adaptação que aumenta a autonomia.", "Um recurso de acessibilidade.", "Uma conversa para descobrir necessidades."],
-    ["autonomia", "Por que é importante respeitar a autonomia de pessoas com deficiência?", "Porque a pessoa deve participar das decisões sobre sua própria vida sempre que possível.", "Porque pedir ajuda é sempre errado.", "Porque ninguém deve oferecer ajuda em nenhuma situação.", "Porque autonomia significa nunca precisar de apoio."],
-    ["estereótipo", "Qual problema existe em presumir que todas as pessoas de um mesmo grupo são iguais?", "Isso ignora diferenças individuais e pode alimentar preconceitos.", "Isso facilita conhecer cada pessoa melhor.", "Isso garante que ninguém seja discriminado.", "Isso elimina a necessidade de ouvir as pessoas."],
-    ["preconceito", "Uma pessoa é julgada negativamente antes de ser conhecida. O que isso exemplifica?", "Um julgamento baseado em preconceito, que deve ser questionado.", "Uma avaliação sempre objetiva.", "Uma forma necessária de proteção.", "Uma regra de convivência obrigatória."],
-    ["racismo", "Qual atitude contribui para enfrentar o racismo no ambiente escolar?", "Questionar discriminações, respeitar diferentes identidades e buscar ajuda diante de situações racistas.", "Ignorar comentários racistas para evitar conflitos.", "Repetir estereótipos quando ninguém parece se importar.", "Dizer que o problema só existe quando há agressão física."],
-    ["xenofobia", "Um estudante sofre comentários por ser de outro país. Qual resposta é adequada?", "Rejeitar a discriminação e valorizar o respeito à origem e à cultura da pessoa.", "Pedir que ele esconda sua origem.", "Fazer piadas para ajudá-lo a se adaptar.", "Dizer que ele deve aceitar os comentários."],
-    ["intolerância", "Como agir diante de uma diferença cultural que você não conhece?", "Perguntar, aprender e respeitar sem transformar a diferença em motivo de humilhação.", "Julgar a prática imediatamente.", "Espalhar informações sem verificar.", "Exigir que a pessoa abandone seus costumes."],
-    ["religião", "Uma turma possui pessoas com diferentes crenças. Qual atitude favorece a convivência?", "Respeitar a liberdade de crença e evitar ataques ou imposições.", "Obrigar todos a seguir a mesma crença.", "Usar a crença de alguém como motivo de piada.", "Impedir que colegas expressem qualquer diferença cultural."],
-    ["gênero", "Como combater estereótipos de gênero em atividades escolares?", "Permitir que todos participem de acordo com seus interesses e capacidades, sem limitar oportunidades por estereótipos.", "Separar atividades apenas com base em ideias tradicionais.", "Dizer que algumas tarefas pertencem naturalmente a um gênero.", "Ridicularizar quem escolhe algo considerado diferente."],
-    ["aparência", "Um aluno recebe comentários sobre seu corpo. Qual atitude é mais respeitosa?", "Não fazer comentários humilhantes e tratar a pessoa com dignidade.", "Afirmar que comentários sobre aparência são sempre inofensivos.", "Sugerir mudanças no corpo sem que a pessoa peça.", "Fazer comparações com outros alunos."],
-    ["condição social", "Um estudante é excluído por usar materiais mais simples. O que isso demonstra?", "Uma forma de discriminação baseada em condição socioeconômica.", "Uma regra necessária de convivência.", "Uma diferença que justifica exclusão.", "Uma brincadeira sem impacto."],
-    ["fala", "Uma pessoa possui um sotaque diferente. Como reagir?", "Ouvir normalmente e evitar imitar o sotaque para ridicularizá-la.", "Imitar o sotaque para divertir a turma.", "Pedir que ela fale como os demais.", "Corrigir sua identidade cultural em público."],
-    ["aprendizagem", "Um aluno aprende em um ritmo diferente. Qual prática é inclusiva?", "Usar estratégias que permitam sua participação e acompanhar seu desenvolvimento.", "Compará-lo constantemente com os colegas.", "Retirá-lo das atividades mais importantes.", "Concluir que ele não pode aprender."],
-    ["acessibilidade digital", "Qual exemplo melhora a acessibilidade de um conteúdo digital?", "Usar recursos como texto alternativo, legendas e estrutura que facilite diferentes formas de acesso.", "Publicar imagens importantes sem descrição.", "Usar apenas áudio em conteúdos essenciais.", "Impedir ajustes de tamanho de texto."],
-    ["comunicação", "Por que perguntar como uma pessoa prefere receber ajuda é importante?", "Porque evita presumir suas necessidades e respeita sua autonomia.", "Porque pessoas com deficiência nunca sabem do que precisam.", "Porque toda ajuda deve ser recusada.", "Porque só familiares podem oferecer ajuda."],
-    ["amizade", "Um amigo revela que sofreu discriminação. Qual resposta é mais acolhedora?", "Ouvir, demonstrar respeito e incentivar a busca de apoio adequado.", "Dizer que ele precisa esquecer rapidamente.", "Perguntar se ele fez algo para provocar a situação.", "Contar a história para outras pessoas sem autorização."],
-    ["escola", "Qual ação da escola favorece uma cultura de inclusão?", "Formar estudantes e profissionais, adaptar práticas e criar canais para enfrentar discriminação.", "Tratar todos exatamente da mesma forma sem considerar barreiras.", "Evitar discutir diferenças para não gerar desconforto.", "Deixar problemas de discriminação apenas entre os estudantes."],
-    ["respeito", "Qual é a melhor regra geral para conviver com diferenças?", "Reconhecer a dignidade de cada pessoa, ouvir suas necessidades e evitar discriminação.", "Esperar que todos se adaptem ao mesmo padrão.", "Evitar pessoas que parecem diferentes.", "Usar diferenças como motivo para escolher quem merece participar."]
+    {
+        tema: "uma pessoa usando cadeira de rodas",
+        correta: "Perguntar antes de ajudar e respeitar a autonomia da pessoa.",
+        erradas: [
+            "Empurrar a cadeira sem avisar para ganhar tempo.",
+            "Apoiar objetos na cadeira porque ela é resistente.",
+            "Falar com o acompanhante em vez de falar com a pessoa.",
+            "Decidir sozinho o caminho que ela deve seguir.",
+            "Segurar a cadeira sempre que houver uma subida, sem perguntar.",
+            "Tratar a cadeira como se fosse um objeto coletivo."
+        ]
+    },
+    {
+        tema: "um colega autista que precisa de uma rotina previsível",
+        correta: "Respeitar a necessidade de previsibilidade e combinar mudanças com clareza quando possível.",
+        erradas: [
+            "Mudar tudo de propósito para testar a reação.",
+            "Dizer que a pessoa precisa simplesmente se acostumar.",
+            "Fazer barulho para chamar atenção quando ela estiver desconfortável.",
+            "Impedir que ela peça informações sobre mudanças.",
+            "Usar uma crise como motivo para piadas.",
+            "Decidir que toda pessoa autista reage da mesma forma."
+        ]
+    },
+    {
+        tema: "uma pessoa com deficiência visual chegando a um lugar desconhecido",
+        correta: "Oferecer ajuda, explicar o ambiente e seguir a orientação da própria pessoa.",
+        erradas: [
+            "Puxá-la pelo braço sem avisar.",
+            "Falar apenas com quem estiver acompanhando.",
+            "Mover os objetos sem informar onde foram colocados.",
+            "Assumir que ela não consegue fazer escolhas.",
+            "Gritar instruções de longe sem perguntar se precisa de ajuda.",
+            "Decidir o caminho por ela sem explicar nada."
+        ]
+    },
+    {
+        tema: "um estudante com deficiência auditiva participando de uma atividade",
+        correta: "Garantir comunicação acessível e perguntar qual recurso facilita a participação.",
+        erradas: [
+            "Falar cada vez mais alto como única solução.",
+            "Deixar a pessoa fora da atividade para evitar atrasos.",
+            "Falar de costas enquanto escreve no quadro.",
+            "Esperar que ela descubra sozinha o que foi explicado.",
+            "Fazer piada quando ela não entender uma instrução.",
+            "Dizer que acessibilidade é responsabilidade apenas da família."
+        ]
+    },
+    {
+        tema: "uma escola que precisa melhorar sua acessibilidade",
+        correta: "Identificar barreiras e implementar adaptações que permitam participação com segurança e autonomia.",
+        erradas: [
+            "Esperar uma reclamação formal antes de considerar qualquer barreira.",
+            "Criar acesso somente para visitantes.",
+            "Bloquear uma rampa quando o espaço estiver cheio.",
+            "Considerar uma adaptação desnecessária porque poucas pessoas a usam.",
+            "Retirar sinalizações para deixar o ambiente mais simples.",
+            "Oferecer ajuda individual como substituto de todas as adaptações."
+        ]
+    },
+    {
+        tema: "um colega com dificuldade para acompanhar uma tarefa",
+        correta: "Perguntar qual apoio é necessário e adaptar a atividade sem diminuir a dignidade da pessoa.",
+        erradas: [
+            "Fazer toda a tarefa no lugar dela sem perguntar.",
+            "Excluir a pessoa da atividade para evitar dificuldades.",
+            "Entregar respostas prontas sempre.",
+            "Falar que ela nunca conseguirá acompanhar a turma.",
+            "Comparar publicamente o desempenho dela com o dos outros.",
+            "Reduzir expectativas automaticamente sem conhecer suas capacidades."
+        ]
+    },
+    {
+        tema: "um estudante com síndrome de Down participando de um trabalho",
+        correta: "Incluir o estudante nas decisões e adaptar o apoio conforme suas necessidades reais.",
+        erradas: [
+            "Decidir tudo por ele sem perguntar sua opinião.",
+            "Deixá-lo apenas em tarefas consideradas fáceis.",
+            "Falar com ele como se fosse uma criança pequena.",
+            "Retirá-lo do grupo para acelerar o trabalho.",
+            "Supor que ele não entende as escolhas do grupo.",
+            "Usar a síndrome como justificativa para não oferecer desafios."
+        ]
+    },
+    {
+        tema: "uma pessoa idosa querendo participar de uma atividade escolar",
+        correta: "Respeitar sua participação e oferecer suporte somente quando necessário ou solicitado.",
+        erradas: [
+            "Impedir a participação porque ela é mais velha.",
+            "Decidir que ela não entende tecnologia sem perguntar.",
+            "Falar devagar e em tom infantil automaticamente.",
+            "Assumir que precisa de ajuda em todas as etapas.",
+            "Fazer piadas sobre idade para quebrar o gelo.",
+            "Deixá-la de fora para que os mais jovens façam tudo."
+        ]
+    },
+    {
+        tema: "uma pessoa com mobilidade reduzida usando um caminho acessível",
+        correta: "Manter o caminho livre e respeitar a função dos recursos de acessibilidade.",
+        erradas: [
+            "Usar a rampa como local para deixar mochilas.",
+            "Estacionar objetos no caminho por poucos minutos.",
+            "Bloquear a passagem quando houver espaço ao lado.",
+            "Retirar placas de acessibilidade por estética.",
+            "Dizer que a pessoa pode pedir ajuda se encontrar uma barreira.",
+            "Considerar a rota acessível opcional quando houver pressa."
+        ]
+    },
+    {
+        tema: "um colega com sensibilidade a sons muito intensos",
+        correta: "Considerar formas de reduzir estímulos e respeitar quando a pessoa precisar se afastar.",
+        erradas: [
+            "Aumentar o barulho para verificar se ela se acostuma.",
+            "Dizer que desconforto com som é frescura.",
+            "Forçar a permanência em um ambiente insuportável.",
+            "Usar a reação da pessoa como entretenimento.",
+            "Impedir que ela comunique o desconforto.",
+            "Criar sons inesperados para chamar sua atenção."
+        ]
+    },
+    {
+        tema: "uma pessoa sendo chamada por um termo capacitista",
+        correta: "Evitar o termo ofensivo e usar uma linguagem respeitosa e adequada ao contexto.",
+        erradas: [
+            "Continuar porque a expressão é comum entre os colegas.",
+            "Dizer que a intenção de ofender não importa, então pode continuar.",
+            "Usar o termo apenas como apelido carinhoso sem perguntar.",
+            "Criar uma versão mais engraçada do insulto.",
+            "Dizer que linguagem não interfere na inclusão.",
+            "Perguntar ao grupo qual insulto parece menos ofensivo."
+        ]
+    },
+    {
+        tema: "um colega com autismo preferindo uma forma específica de comunicação",
+        correta: "Respeitar a forma de comunicação que funciona para a pessoa e buscar acessibilidade.",
+        erradas: [
+            "Obrigá-lo a se comunicar exatamente como a maioria.",
+            "Ignorar sua comunicação porque ela é diferente.",
+            "Fazer piada com o modo como ele se expressa.",
+            "Falar por ele sem necessidade.",
+            "Decidir que uma única forma de comunicação serve para todos.",
+            "Evitar conversar com ele para não precisar adaptar a comunicação."
+        ]
+    },
+    {
+        tema: "uma pessoa com deficiência querendo tomar sua própria decisão",
+        correta: "Respeitar sua autonomia e oferecer informações ou apoio sem assumir o controle.",
+        erradas: [
+            "Decidir no lugar dela para facilitar o processo.",
+            "Perguntar primeiro ao acompanhante em todas as situações.",
+            "Dizer que deficiência impede decisões independentes.",
+            "Escolher a opção que parece melhor sem consultar.",
+            "Impedir que ela recuse uma ajuda oferecida.",
+            "Tratar autonomia como algo que só pessoas sem deficiência possuem."
+        ]
+    },
+    {
+        tema: "uma atividade em grupo que não considera diferentes necessidades",
+        correta: "Planejar adaptações para que as pessoas possam participar de maneira justa.",
+        erradas: [
+            "Manter a mesma atividade mesmo quando uma barreira é conhecida.",
+            "Excluir quem precisa de adaptação para simplificar o trabalho.",
+            "Dar a mesma tarefa sem considerar acessibilidade.",
+            "Esperar que cada pessoa resolva sozinha qualquer barreira.",
+            "Oferecer participação apenas como espectador.",
+            "Considerar adaptações um privilégio injusto."
+        ]
+    },
+    {
+        tema: "uma pessoa sendo tratada como incapaz por causa da deficiência",
+        correta: "Combater o capacitismo e avaliar as capacidades reais da pessoa, não estereótipos.",
+        erradas: [
+            "Reduzir todas as expectativas automaticamente.",
+            "Impedir que ela tente atividades novas.",
+            "Falar por ela sempre que houver uma dificuldade.",
+            "Dizer que a deficiência define tudo sobre sua personalidade.",
+            "Escolher apenas tarefas simples sem consultar.",
+            "Afirmar que proteção significa impedir qualquer autonomia."
+        ]
+    },
+    {
+        tema: "um estudante usando aparelho de mobilidade durante uma aula",
+        correta: "Respeitar o equipamento e nunca mexer nele sem autorização.",
+        erradas: [
+            "Tocar no equipamento para ver como funciona.",
+            "Usá-lo como apoio para alcançar algo.",
+            "Mover o equipamento para abrir espaço sem avisar.",
+            "Fazer perguntas invasivas sobre o corpo da pessoa.",
+            "Brincar com o equipamento quando ninguém estiver olhando.",
+            "Decidir que equipamentos de mobilidade podem ser compartilhados."
+        ]
+    },
+    {
+        tema: "uma pessoa com deficiência participando de uma conversa",
+        correta: "Falar diretamente com ela, ouvir sua resposta e evitar pressupor suas capacidades.",
+        erradas: [
+            "Falar somente com seu acompanhante.",
+            "Usar tom infantil automaticamente.",
+            "Responder por ela sem que tenha pedido.",
+            "Supor que não compreenderá assuntos complexos.",
+            "Evitar perguntas para não constrangê-la.",
+            "Mudar de assunto sempre que sua deficiência for mencionada."
+        ]
+    },
+    {
+        tema: "uma equipe querendo criar uma escola mais inclusiva",
+        correta: "Ouvir as pessoas afetadas, identificar barreiras e acompanhar se as soluções funcionam.",
+        erradas: [
+            "Criar soluções sem consultar ninguém que enfrente as barreiras.",
+            "Fazer apenas uma campanha visual e não mudar práticas.",
+            "Considerar inclusão resolvida depois de uma única palestra.",
+            "Escolher adaptações apenas pela aparência.",
+            "Priorizar somente mudanças que não alterem nenhuma rotina.",
+            "Medir inclusão apenas pelo número de cartazes existentes."
+        ]
+    },
+    {
+        tema: "uma pessoa com deficiência recebendo ajuda que não pediu",
+        correta: "Perguntar se ela precisa de ajuda e aceitar sua resposta, inclusive quando disser não.",
+        erradas: [
+            "Continuar ajudando mesmo depois de ela recusar.",
+            "Dizer que ela não sabe o que é melhor para si.",
+            "Chamar outras pessoas para insistirem.",
+            "Ficar ofendido porque a ajuda foi recusada.",
+            "Tomar a decisão por ela para evitar riscos imaginados.",
+            "Considerar qualquer recusa como ingratidão."
+        ]
+    },
+    {
+        tema: "um colega sendo excluído por precisar de uma adaptação",
+        correta: "Tratar a adaptação como recurso de equidade e garantir que o colega participe do grupo.",
+        erradas: [
+            "Dizer que a adaptação dá vantagem injusta.",
+            "Retirar a pessoa da atividade para manter igualdade aparente.",
+            "Proibir adaptações para todos receberem exatamente o mesmo tratamento.",
+            "Fazer comentários sobre o recurso usado.",
+            "Exigir que a pessoa dispense o recurso para participar.",
+            "Comparar publicamente a adaptação com um privilégio."
+        ]
+    },
+    {
+        tema: "um estudante com dificuldade de leitura recebendo uma prova",
+        correta: "Usar recursos ou adaptações previstos para garantir acesso ao conteúdo e avaliação justa.",
+        erradas: [
+            "Dizer que qualquer adaptação facilita demais a prova.",
+            "Entregar a prova sem considerar uma necessidade já conhecida.",
+            "Dar respostas sem que isso seja parte da adaptação.",
+            "Excluir o estudante da avaliação.",
+            "Fazer a prova no lugar dele.",
+            "Diminuir a importância da avaliação porque ele precisa de apoio."
+        ]
+    },
+    {
+        tema: "uma pessoa sendo julgada por sua aparência física",
+        correta: "Evitar estereótipos e avaliar a pessoa por suas atitudes e individualidade.",
+        erradas: [
+            "Presumir personalidade pela aparência.",
+            "Fazer piadas para testar sua reação.",
+            "Escolher amigos apenas pelo padrão visual do grupo.",
+            "Usar aparência como critério para competência.",
+            "Espalhar comentários sobre o corpo da pessoa.",
+            "Dizer que aparência determina o valor de alguém."
+        ]
+    },
+    {
+        tema: "uma pessoa com deficiência sendo superprotegida",
+        correta: "Oferecer segurança sem retirar oportunidades de escolha, participação e autonomia.",
+        erradas: [
+            "Impedir qualquer atividade que pareça desafiadora.",
+            "Fazer tudo pela pessoa mesmo quando ela quer participar.",
+            "Escolher seus caminhos sem consultar.",
+            "Evitar que ela assuma responsabilidades.",
+            "Dizer que autonomia é perigosa para pessoas com deficiência.",
+            "Usar proteção como justificativa para exclusão."
+        ]
+    },
+    {
+        tema: "um grupo discutindo a diferença entre igualdade e equidade",
+        correta: "Compreender que equidade considera necessidades diferentes para ampliar oportunidades justas.",
+        erradas: [
+            "Afirmar que justiça significa sempre entregar exatamente o mesmo recurso.",
+            "Dizer que equidade permite favorecer qualquer pessoa sem critério.",
+            "Considerar adaptações incompatíveis com igualdade de direitos.",
+            "Afirmar que necessidades diferentes devem ser ignoradas.",
+            "Tratar equidade como uma forma de excluir quem não precisa de apoio.",
+            "Dizer que todos devem enfrentar exatamente as mesmas barreiras."
+        ]
+    },
+    {
+        tema: "uma pessoa sendo excluída por ter uma característica considerada diferente",
+        correta: "Questionar a exclusão e criar condições para que a diferença não vire barreira à participação.",
+        erradas: [
+            "Afastar a pessoa para evitar que o grupo mude.",
+            "Dizer que diferenças devem ficar fora de espaços coletivos.",
+            "Pedir que ela esconda sua característica para ser aceita.",
+            "Usar estereótipos para justificar a separação.",
+            "Permitir participação somente em atividades isoladas.",
+            "Considerar a exclusão natural quando a maioria é diferente."
+        ]
+    },
+    {
+        tema: "uma escola usando linguagem sobre inclusão em seus projetos",
+        correta: "Combinar linguagem respeitosa com ações concretas que reduzam barreiras e discriminação.",
+        erradas: [
+            "Usar palavras bonitas sem mudar nenhuma prática.",
+            "Considerar inclusão apenas uma campanha de publicidade.",
+            "Evitar ouvir estudantes para preservar a imagem da escola.",
+            "Tratar acessibilidade como decoração.",
+            "Fazer um evento e encerrar todas as ações depois dele.",
+            "Medir inclusão apenas pela quantidade de publicações."
+        ]
+    },
+    {
+        tema: "uma pessoa sendo interrompida porque precisa de mais tempo para responder",
+        correta: "Dar tempo para a pessoa concluir sua comunicação sem tratá-la como menos capaz.",
+        erradas: [
+            "Completar todas as frases por ela.",
+            "Mudar de assunto porque a resposta demorou.",
+            "Fazer piada sobre sua velocidade de fala.",
+            "Responder por ela sem perguntar.",
+            "Dizer que pessoas rápidas devem falar por todos.",
+            "Evitar conversar com ela para economizar tempo."
+        ]
+    },
+    {
+        tema: "um estudante defendendo a inclusão de um colega",
+        correta: "Apoiar o colega sem falar por ele desnecessariamente e buscar soluções junto com as pessoas envolvidas.",
+        erradas: [
+            "Tomar todas as decisões pelo colega.",
+            "Transformar a situação em uma disputa pública.",
+            "Expor detalhes pessoais para provar que ele precisa de apoio.",
+            "Impedir que o próprio colega dê sua opinião.",
+            "Usar sua história como conteúdo para redes sociais sem autorização.",
+            "Decidir que defender alguém exige falar no lugar dessa pessoa."
+        ]
+    },
+    {
+        tema: "uma turma recebendo um colega com uma necessidade diferente",
+        correta: "Promover acolhimento, respeito e ajustes necessários sem transformar a pessoa em objeto de curiosidade.",
+        erradas: [
+            "Fazer muitas perguntas pessoais na frente de todos.",
+            "Tratar a pessoa como mascote da turma.",
+            "Decidir que ela precisa de ajuda em tudo.",
+            "Evitar incluí-la até descobrir toda sua história.",
+            "Criar apelidos relacionados à sua necessidade.",
+            "Exigir que ela conte detalhes pessoais para ser aceita."
+        ]
+    },
+    {
+        tema: "uma pessoa sendo julgada por precisar de tecnologia assistiva",
+        correta: "Reconhecer a tecnologia como recurso de acessibilidade e respeitar seu uso.",
+        erradas: [
+            "Dizer que usar tecnologia é uma vantagem indevida.",
+            "Pedir para testar o equipamento sem autorização.",
+            "Fazer piada com o dispositivo.",
+            "Esconder o equipamento para brincar.",
+            "Exigir que a pessoa faça tudo sem o recurso.",
+            "Considerar o equipamento um privilégio dispensável."
+        ]
+    },
+    {
+        tema: "uma situação em que uma adaptação parece diferente do tratamento dado aos demais",
+        correta: "Avaliar se a diferença de tratamento é necessária para garantir participação e oportunidades justas.",
+        erradas: [
+            "Concluir que qualquer diferença é injusta.",
+            "Retirar a adaptação para deixar tudo visualmente igual.",
+            "Comparar apenas o recurso recebido, sem olhar as barreiras enfrentadas.",
+            "Impedir adaptações para evitar reclamações.",
+            "Considerar equidade uma forma de privilégio automático.",
+            "Decidir que justiça exige que todos enfrentem as mesmas dificuldades."
+        ]
+    },
+    {
+        tema: "um projeto escolar sobre diversidade e respeito",
+        correta: "Apresentar diferentes perspectivas com respeito e evitar estereótipos ou generalizações.",
+        erradas: [
+            "Representar grupos inteiros por um único estereótipo.",
+            "Escolher apenas opiniões que confirmem ideias preconcebidas.",
+            "Fazer humor com características pessoais para chamar atenção.",
+            "Falar sobre diversidade sem ouvir pessoas diferentes.",
+            "Tratar diferenças como curiosidades exóticas.",
+            "Usar exemplos ofensivos para tornar o trabalho mais impactante."
+        ]
+    },
+    {
+        tema: "uma pessoa sendo excluída por não se encaixar no padrão do grupo",
+        correta: "Questionar o padrão e ampliar a participação sem exigir que a pessoa abandone sua identidade.",
+        erradas: [
+            "Pressionar a pessoa a mudar para ser aceita.",
+            "Manter o padrão porque a maioria prefere assim.",
+            "Criar regras que eliminem diferenças visíveis.",
+            "Dizer que pertencimento depende de parecer com os demais.",
+            "Afastar quem não acompanha o padrão.",
+            "Tratar diversidade como problema de adaptação individual."
+        ]
+    }
 ];
 
-// ------------------------------------------------------
-// Cada tema recebe 5 perguntas realmente diferentes.
-// As alternativas também são embaralhadas a cada partida,
-// então a correta não fica sempre na menor alternativa.
-// ------------------------------------------------------
+// ============================================================
+// GERAÇÃO DAS 300 PERGUNTAS
+// Cada tema gera 5 perguntas realmente diferentes.
+// As alternativas erradas mudam conforme o nível.
+// A alternativa correta é embaralhada em todas as questões.
+// ============================================================
+
 const modelosPergunta = [
-    (base) => base[1],
-    (base) => `Em uma situação relacionada a ${base[0]}, qual escolha apresenta a atitude mais adequada?`,
-    (base) => `Imagine que isso aconteça na sua turma envolvendo ${base[0]}. Qual decisão demonstra respeito?`,
-    (base) => `Se você perceber uma situação de ${base[0]}, qual ação deve ser priorizada?`,
-    (base) => `Qual princípio deve orientar sua reação diante de um caso de ${base[0]}?`
+    "Qual é a melhor atitude diante de {tema}?",
+    "Você presencia {tema}. Qual decisão demonstra respeito e responsabilidade?",
+    "Por que a resposta correta é importante quando ocorre {tema}?",
+    "Analise a situação de {tema}. Qual opção evita agravar o problema?",
+    "Em uma situação mais complexa envolvendo {tema}, qual princípio deve orientar sua atitude?"
 ];
 
-function criarBanco(banco) {
+function gerarBanco(banco) {
     const perguntas = [];
 
-    banco.forEach((base, temaIndex) => {
-        for (let variacao = 0; variacao < 5; variacao++) {
-            let texto;
-            if (variacao === 0) {
-                texto = base[1];
-            } else {
-                texto = modelosPergunta[variacao](base);
-                texto += `\n\nSituação para analisar: ${base[1].replace(/^[^?]*\?\s*/, "")}`;
-            }
+    for (let nivel = 0; nivel < 5; nivel++) {
+        banco.forEach((item, indiceTema) => {
+            const perguntaTexto = modelosPergunta[nivel].replace("{tema}", item.tema);
+            const inicio = (nivel * 2 + indiceTema) % item.erradas.length;
+            const erradas = escolherTresUnicas(item.erradas, inicio);
 
             const alternativas = [
-                { texto: base[2], correta: true },
-                { texto: base[3], correta: false },
-                { texto: base[4], correta: false },
-                { texto: base[5], correta: false }
+                { texto: item.correta, correta: true },
+                ...erradas.map(texto => ({ texto, correta: false }))
             ];
 
             perguntas.push({
-                id: `${temaIndex + 1}-${variacao + 1}`,
-                tema: base[0],
-                pergunta: texto,
-                alternativas,
-                nivel: nivelDaPergunta(perguntas.length),
-                pontos: pontosDaPergunta(perguntas.length)
+                pergunta: perguntaTexto,
+                alternativas: embaralhar(alternativas),
+                nivel: nivel + 1,
+                nomeNivel: niveis[nivel].nome,
+                pontos: niveis[nivel].pontos
             });
-        }
-    });
-
-    return perguntas;
-}
-
-const perguntasBullying = criarBanco(bancoBullying);
-const perguntasInclusao = criarBanco(bancoInclusao);
-
-// Verificação automática: evita banco quebrado.
-function validarBanco(perguntas, nome) {
-    if (perguntas.length !== TOTAL_PERGUNTAS) {
-        console.error(`${nome}: esperado ${TOTAL_PERGUNTAS}, encontrado ${perguntas.length}.`);
+        });
     }
 
-    const ids = new Set();
-    perguntas.forEach((p) => {
-        if (ids.has(p.id)) console.error(`ID repetido em ${nome}: ${p.id}`);
-        ids.add(p.id);
-
-        if (p.alternativas.length !== 4) {
-            console.error(`Pergunta ${p.id} não possui 4 alternativas.`);
-        }
-
-        const textos = p.alternativas.map(a => a.texto.trim().toLowerCase());
-        if (new Set(textos).size !== 4) {
-            console.error(`Alternativas repetidas na pergunta ${p.id}.`);
-        }
+    // Segurança: remove qualquer duplicação exata de pergunta.
+    const vistos = new Set();
+    const semDuplicatas = perguntas.filter(q => {
+        const chave = q.pergunta.trim().toLowerCase();
+        if (vistos.has(chave)) return false;
+        vistos.add(chave);
+        return true;
     });
+
+    if (semDuplicatas.length !== TOTAL_PERGUNTAS) {
+        console.warn("Banco com quantidade diferente do esperado:", semDuplicatas.length);
+    }
+
+    return semDuplicatas;
 }
 
-validarBanco(perguntasBullying, "Bullying");
-validarBanco(perguntasInclusao, "Inclusão");
+const perguntasBullying = gerarBanco(bancoBullying);
+const perguntasInclusao = gerarBanco(bancoInclusao);
 
-// ------------------------------------------------------
+// ============================================================
 // SOM
-// ------------------------------------------------------
-function tocarSom(frequencia = 700) {
+// ============================================================
+function tocarSom(frequencia, duracao = 0.1) {
     if (!somAtivo) return;
     try {
-        audioContext = audioContext || new (window.AudioContext || window.webkitAudioContext)();
+        audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
         const oscilador = audioContext.createOscillator();
         const ganho = audioContext.createGain();
         oscilador.frequency.value = frequencia;
-        ganho.gain.value = 0.04;
+        ganho.gain.setValueAtTime(0.04, audioContext.currentTime);
+        ganho.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duracao);
         oscilador.connect(ganho);
         ganho.connect(audioContext.destination);
         oscilador.start();
-        oscilador.stop(audioContext.currentTime + 0.12);
-    } catch (e) {}
+        oscilador.stop(audioContext.currentTime + duracao);
+    } catch (_) {}
 }
 
 function alternarSom() {
     somAtivo = !somAtivo;
     const botao = document.querySelector(".botao-som");
     if (botao) botao.textContent = somAtivo ? "🔊 Som ativado" : "🔇 Som desativado";
-    if (somAtivo) tocarSom();
+    if (somAtivo) tocarSom(700);
 }
 
-// ------------------------------------------------------
-// INÍCIO / SELEÇÃO
-// ------------------------------------------------------
+// ============================================================
+// INICIAR / CONTINUAR JOGO
+// ============================================================
 function selecionarJogo(tipo) {
     jogoAtual = tipo;
     perguntaAtual = 0;
@@ -230,23 +925,25 @@ function selecionarJogo(tipo) {
     const banco = tipo === "bullying" ? perguntasBullying : perguntasInclusao;
     perguntasDoJogo = embaralhar(banco);
 
-    // Começar de novo remove somente o progresso deste jogo.
-    localStorage.removeItem(chaveProgresso(tipo));
+    // A ordem embaralhada seria ruim para a progressão da dificuldade.
+    // Reorganizamos por dificuldade e embaralhamos apenas dentro de cada nível.
+    perguntasDoJogo = [];
+    for (let nivel = 1; nivel <= 5; nivel++) {
+        const bloco = banco.filter(q => q.nivel === nivel);
+        perguntasDoJogo.push(...embaralhar(bloco));
+    }
 
-    abrirJogo();
+    mostrarTela("jogo");
     mostrarPergunta();
 }
 
-function abrirJogo() {
-    document.getElementById("inicio").classList.add("escondido");
-    document.getElementById("rankingTela").classList.add("escondido");
-    document.getElementById("resultado").classList.add("escondido");
-    document.getElementById("jogo").classList.remove("escondido");
+function mostrarTela(tela) {
+    ["inicio", "rankingTela", "jogo", "resultado"].forEach(id => {
+        document.getElementById(id)?.classList.add("escondido");
+    });
+    document.getElementById(tela)?.classList.remove("escondido");
 }
 
-// ------------------------------------------------------
-// PERGUNTAS
-// ------------------------------------------------------
 function mostrarPergunta() {
     if (perguntaAtual >= TOTAL_PERGUNTAS) {
         mostrarResultado();
@@ -254,57 +951,65 @@ function mostrarPergunta() {
     }
 
     respostaDada = false;
-    const pergunta = perguntasDoJogo[perguntaAtual];
+    const questao = perguntasDoJogo[perguntaAtual];
     const fase = Math.floor(perguntaAtual / PERGUNTAS_POR_FASE) + 1;
     const numeroNaFase = (perguntaAtual % PERGUNTAS_POR_FASE) + 1;
 
     document.getElementById("faseAtual").textContent = `🏁 Fase ${fase} de ${TOTAL_FASES}`;
-    document.getElementById("numeroPergunta").textContent = `Pergunta ${numeroNaFase} de ${PERGUNTAS_POR_FASE}`;
+    document.getElementById("numeroPergunta").textContent = `Pergunta ${numeroNaFase} de 10`;
     document.getElementById("pontuacao").textContent = `⭐ Pontos: ${pontos}`;
-    document.getElementById("progressoFase").style.width = `${(numeroNaFase / PERGUNTAS_POR_FASE) * 100}%`;
-    document.getElementById("progressoTexto").textContent = `Fase ${fase} — ${numeroNaFase - 1} de 10 respondidas`;
     document.getElementById("numeroBola").textContent = perguntaAtual + 1;
+    document.getElementById("pergunta").textContent = questao.pergunta;
     document.getElementById("tituloJogo").textContent = jogoAtual === "bullying" ? "🛡️ A Luta Contra o Bullying" : "♿ Respeito às Diferenças";
-    document.getElementById("pergunta").textContent = pergunta.pergunta;
-    document.getElementById("feedback").textContent = `🎯 Nível: ${pergunta.nivel} | Vale ${pergunta.pontos} pontos`;
+    document.getElementById("feedback").textContent = `Nível: ${questao.nomeNivel} • Vale ${questao.pontos} pontos`;
     document.getElementById("areaProxima").innerHTML = "";
 
-    const alternativas = embaralhar(pergunta.alternativas);
-    const container = document.getElementById("alternativas");
-    container.innerHTML = "";
+    const progresso = ((numeroNaFase - 1) / PERGUNTAS_POR_FASE) * 100;
+    document.getElementById("progressoFase").style.width = `${progresso}%`;
+    document.getElementById("progressoTexto").textContent = `Fase ${fase} — ${numeroNaFase - 1} de 10 respondidas`;
 
-    const letras = ["A", "B", "C", "D"];
+    const area = document.getElementById("alternativas");
+    area.innerHTML = "";
 
-    alternativas.forEach((alt, index) => {
+    questao.alternativas.forEach((alternativa, indice) => {
         const botao = document.createElement("button");
         botao.className = "alternativa";
-        botao.innerHTML = `<strong>${letras[index]})</strong> ${alt.texto}`;
-        botao.onclick = () => responder(botao, alt.correta, pergunta.pontos);
-        container.appendChild(botao);
+        botao.type = "button";
+        botao.textContent = `${String.fromCharCode(65 + indice)}) ${alternativa.texto}`;
+        botao.onclick = () => escolherResposta(botao, alternativa.correta, questao.pontos);
+        area.appendChild(botao);
     });
 }
 
-function responder(botaoClicado, correta, valor) {
+function escolherResposta(botaoEscolhido, correta, valor) {
     if (respostaDada) return;
     respostaDada = true;
 
-    document.querySelectorAll(".alternativa").forEach(botao => {
-        botao.disabled = true;
-        if (botao === botaoClicado && correta) botao.classList.add("correta");
-        if (botao === botaoClicado && !correta) botao.classList.add("errada");
-    });
+    const botoes = document.querySelectorAll("#alternativas .alternativa");
+    botoes.forEach(botao => botao.disabled = true);
 
     if (correta) {
         pontos += valor;
+        botaoEscolhido.classList.add("correta");
         document.getElementById("feedback").textContent = `✅ Muito bem! +${valor} pontos de empatia.`;
-        tocarSom(1000);
+        tocarSom(900);
     } else {
-        document.getElementById("feedback").textContent = "❌ Não foi dessa vez. Reflita sobre a situação e continue.";
-        tocarSom(300);
+        botaoEscolhido.classList.add("errada");
+        document.getElementById("feedback").textContent = "❌ Não é essa. A resposta correta está destacada.";
+        botoes.forEach(botao => {
+            const letra = botao.textContent.charAt(0);
+            const indice = letra.charCodeAt(0) - 65;
+            const alt = perguntasDoJogo[perguntaAtual].alternativas[indice];
+            if (alt?.correta) botao.classList.add("correta");
+        });
+        tocarSom(220);
     }
 
     document.getElementById("pontuacao").textContent = `⭐ Pontos: ${pontos}`;
-    document.getElementById("progressoTexto").textContent = `Fase ${Math.floor(perguntaAtual / 10) + 1} — ${(perguntaAtual % 10) + 1} de 10 respondidas`;
+    const numeroNaFase = (perguntaAtual % PERGUNTAS_POR_FASE) + 1;
+    document.getElementById("progressoTexto").textContent = `Fase ${Math.floor(perguntaAtual / 10) + 1} — ${numeroNaFase} de 10 respondidas`;
+    document.getElementById("progressoFase").style.width = `${(numeroNaFase / 10) * 100}%`;
+
     criarBotaoProxima();
     salvarProgresso();
 }
@@ -313,55 +1018,78 @@ function criarBotaoProxima() {
     const area = document.getElementById("areaProxima");
     area.innerHTML = "";
     const botao = document.createElement("button");
-    botao.textContent = perguntaAtual === TOTAL_PERGUNTAS - 1 ? "🏆 Ver resultado" : "➡️ Próxima pergunta";
+
+    if (perguntaAtual === TOTAL_PERGUNTAS - 1) {
+        botao.textContent = "🏆 Ver resultado";
+    } else if ((perguntaAtual + 1) % PERGUNTAS_POR_FASE === 0) {
+        botao.textContent = "🚀 Ir para a próxima fase";
+    } else {
+        botao.textContent = "➡️ Próxima pergunta";
+    }
+
     botao.onclick = proximaPergunta;
     area.appendChild(botao);
 }
 
 function proximaPergunta() {
     perguntaAtual++;
+    salvarProgresso();
+
     if (perguntaAtual >= TOTAL_PERGUNTAS) {
         mostrarResultado();
         return;
     }
-    salvarProgresso();
-    mostrarPergunta();
+
+    if (perguntaAtual % PERGUNTAS_POR_FASE === 0) {
+        mostrarMensagemFase();
+        tocarSom(1100);
+    } else {
+        mostrarPergunta();
+    }
 }
 
-// ------------------------------------------------------
-// RESULTADO
-// ------------------------------------------------------
-function pontuacaoMaxima() {
-    let total = 0;
-    for (let i = 0; i < TOTAL_PERGUNTAS; i++) total += pontosDaPergunta(i);
-    return total;
+function mostrarMensagemFase() {
+    const fase = Math.floor(perguntaAtual / PERGUNTAS_POR_FASE) + 1;
+    document.getElementById("pergunta").textContent = `🎉 Você chegou à Fase ${fase}!`;
+    document.getElementById("alternativas").innerHTML = `<p class="centralizado">Prepare-se: as perguntas ficam mais difíceis conforme você avança.</p>`;
+    document.getElementById("feedback").textContent = `🔥 Agora começa a ${niveis[Math.min(4, Math.floor(perguntaAtual / 30))].nome.replace(/^[^ ]+ /, "")}!`;
+    document.getElementById("areaProxima").innerHTML = "";
+
+    const botao = document.createElement("button");
+    botao.textContent = `▶️ Começar Fase ${fase}`;
+    botao.onclick = mostrarPergunta;
+    document.getElementById("areaProxima").appendChild(botao);
+}
+
+// ============================================================
+// RESULTADO / RANKING
+// ============================================================
+function obterPontuacaoMaxima() {
+    return 30 * 10 + 30 * 12 + 30 * 15 + 30 * 20 + 30 * 25;
 }
 
 function mostrarResultado() {
-    const maximo = pontuacaoMaxima();
+    const maximo = obterPontuacaoMaxima();
     const porcentagem = Math.round((pontos / maximo) * 100);
-
-    let medalha;
-    let mensagem;
+    let medalha, mensagem;
 
     if (porcentagem >= 90) {
         medalha = "🥇 OURO";
         mensagem = "Excelente! Você demonstrou muito conhecimento, respeito e empatia.";
     } else if (porcentagem >= 70) {
         medalha = "🥈 PRATA";
-        mensagem = "Muito bom! Você mostrou uma ótima compreensão do tema.";
+        mensagem = "Muito bom! Você mostrou uma ótima compreensão dos temas.";
     } else if (porcentagem >= 50) {
         medalha = "🥉 BRONZE";
         mensagem = "Bom trabalho! Continue aprendendo sobre respeito e inclusão.";
     } else {
         medalha = "📚 PARTICIPAÇÃO";
-        mensagem = "Continue aprendendo. Cada pergunta é uma oportunidade para melhorar.";
+        mensagem = "Continue praticando. O importante é aprender e melhorar.";
     }
 
-    document.getElementById("jogo").classList.add("escondido");
-    document.getElementById("resultado").classList.remove("escondido");
+    mostrarTela("resultado");
     document.getElementById("resultadoTitulo").textContent = jogoAtual === "bullying" ? "🛡️ A Luta Contra o Bullying" : "♿ Respeito às Diferenças";
-    document.getElementById("pontuacaoFinal").textContent = `⭐ Pontuação: ${pontos}`;
+    document.getElementById("pontuacaoFinal").textContent = `⭐ Pontuação: ${pontos} de ${maximo}`;
     document.getElementById("porcentagemFinal").textContent = `📊 Aproveitamento: ${porcentagem}%`;
     document.getElementById("medalhaFinal").textContent = medalha;
     document.getElementById("mensagemFinal").textContent = mensagem;
@@ -371,9 +1099,6 @@ function mostrarResultado() {
     tocarSom(1200);
 }
 
-// ------------------------------------------------------
-// RANKING
-// ------------------------------------------------------
 function salvarRanking(jogo, pontosObtidos, porcentagem, medalha) {
     const ranking = JSON.parse(localStorage.getItem("rankingJogo") || "[]");
     ranking.push({ jogo, pontos: pontosObtidos, porcentagem, medalha, data: new Date().toLocaleDateString("pt-BR") });
@@ -382,9 +1107,7 @@ function salvarRanking(jogo, pontosObtidos, porcentagem, medalha) {
 }
 
 function mostrarRanking() {
-    document.getElementById("inicio").classList.add("escondido");
-    document.getElementById("rankingTela").classList.remove("escondido");
-
+    mostrarTela("rankingTela");
     const lista = document.getElementById("rankingLista");
     const ranking = JSON.parse(localStorage.getItem("rankingJogo") || "[]");
 
@@ -399,38 +1122,40 @@ function mostrarRanking() {
         div.className = "ranking-item";
         const posicao = indice === 0 ? "🥇" : indice === 1 ? "🥈" : indice === 2 ? "🥉" : `${indice + 1}º`;
         const nome = item.jogo === "bullying" ? "🛡️ Bullying" : "♿ Inclusão";
-        div.innerHTML = `<span class="ranking-posicao">${posicao}</span><span class="ranking-nome">${nome}<br><small>${item.data} — ${item.porcentagem}%</small></span><span class="ranking-pontos">${item.pontos} pts</span>`;
+        div.innerHTML = `<span class="ranking-posicao">${posicao}</span><span class="ranking-nome">${nome}<br><small>${item.data}</small></span><span class="ranking-pontos">${item.pontos} pts</span>`;
         lista.appendChild(div);
     });
 }
 
 function fecharRanking() {
-    document.getElementById("rankingTela").classList.add("escondido");
-    document.getElementById("inicio").classList.remove("escondido");
+    mostrarTela("inicio");
     verificarJogosSalvos();
 }
 
-// ------------------------------------------------------
-// SALVAMENTO SEPARADO
-// ------------------------------------------------------
+// ============================================================
+// SALVAMENTO SEPARADO DOS DOIS JOGOS
+// ============================================================
 function chaveProgresso(jogo) {
     return jogo === "bullying" ? "progressoBullying" : "progressoInclusao";
 }
 
 function salvarProgresso() {
     if (!jogoAtual || !perguntasDoJogo.length) return;
-    localStorage.setItem(chaveProgresso(jogoAtual), JSON.stringify({
+
+    const dados = {
+        versao: 2,
         jogo: jogoAtual,
         pergunta: perguntaAtual,
         pontos,
         ordem: perguntasDoJogo
-    }));
+    };
+
+    localStorage.setItem(chaveProgresso(jogoAtual), JSON.stringify(dados));
 }
 
 function salvarESair() {
     salvarProgresso();
-    document.getElementById("jogo").classList.add("escondido");
-    document.getElementById("inicio").classList.remove("escondido");
+    mostrarTela("inicio");
     verificarJogosSalvos();
 }
 
@@ -438,8 +1163,10 @@ function obterProgresso(jogo) {
     const salvo = localStorage.getItem(chaveProgresso(jogo));
     if (!salvo) return null;
     try {
-        return JSON.parse(salvo);
-    } catch (erro) {
+        const dados = JSON.parse(salvo);
+        if (dados.versao !== 2 || !Array.isArray(dados.ordem) || dados.ordem.length !== TOTAL_PERGUNTAS) return null;
+        return dados;
+    } catch (_) {
         localStorage.removeItem(chaveProgresso(jogo));
         return null;
     }
@@ -459,14 +1186,14 @@ function verificarJogosSalvos() {
     let html = `<h3>💾 Jogos salvos</h3>`;
 
     if (bullying) {
-        const fase = Math.min(Math.floor(bullying.pergunta / 10) + 1, TOTAL_FASES);
-        const pergunta = Math.min((bullying.pergunta % 10) + 1, 10);
+        const fase = Math.min(TOTAL_FASES, Math.floor(bullying.pergunta / 10) + 1);
+        const pergunta = Math.min(10, (bullying.pergunta % 10) + 1);
         html += `<div class="jogo-salvo"><strong>🛡️ A Luta Contra o Bullying</strong><span>Fase ${fase} de ${TOTAL_FASES} — Pergunta ${pergunta} de 10 — ${bullying.pontos} pontos</span><button onclick="continuarJogo('bullying')">▶️ Continuar Bullying</button><button class="botao-apagar" onclick="apagarProgresso('bullying')">🗑️ Apagar</button></div>`;
     }
 
     if (inclusao) {
-        const fase = Math.min(Math.floor(inclusao.pergunta / 10) + 1, TOTAL_FASES);
-        const pergunta = Math.min((inclusao.pergunta % 10) + 1, 10);
+        const fase = Math.min(TOTAL_FASES, Math.floor(inclusao.pergunta / 10) + 1);
+        const pergunta = Math.min(10, (inclusao.pergunta % 10) + 1);
         html += `<div class="jogo-salvo"><strong>♿ Respeito às Diferenças</strong><span>Fase ${fase} de ${TOTAL_FASES} — Pergunta ${pergunta} de 10 — ${inclusao.pontos} pontos</span><button onclick="continuarJogo('inclusao')">▶️ Continuar Inclusão</button><button class="botao-apagar" onclick="apagarProgresso('inclusao')">🗑️ Apagar</button></div>`;
     }
 
@@ -476,13 +1203,15 @@ function verificarJogosSalvos() {
 
 function continuarJogo(tipo) {
     const dados = obterProgresso(tipo);
-    if (!dados || !Array.isArray(dados.ordem) || !dados.ordem.length) return;
+    if (!dados) return;
 
     jogoAtual = dados.jogo;
-    perguntaAtual = Number(dados.pergunta) || 0;
+    perguntaAtual = Math.min(Math.max(0, dados.pergunta), TOTAL_PERGUNTAS - 1);
     pontos = Number(dados.pontos) || 0;
     perguntasDoJogo = dados.ordem;
-    abrirJogo();
+    respostaDada = false;
+
+    mostrarTela("jogo");
     mostrarPergunta();
 }
 
@@ -491,22 +1220,20 @@ function apagarProgresso(tipo) {
     verificarJogosSalvos();
 }
 
-// ------------------------------------------------------
-// BOTÕES FINAIS
-// ------------------------------------------------------
 function jogarNovamente() {
+    // Apaga somente o jogo terminado; o outro jogo permanece salvo.
+    localStorage.removeItem(chaveProgresso(jogoAtual));
     selecionarJogo(jogoAtual);
 }
 
 function voltarAoMenu() {
-    document.getElementById("resultado").classList.add("escondido");
-    document.getElementById("jogo").classList.add("escondido");
-    document.getElementById("inicio").classList.remove("escondido");
+    mostrarTela("inicio");
     verificarJogosSalvos();
 }
 
+// Mantém compatibilidade com versões anteriores do HTML.
 function verificarJogoSalvo() {
     verificarJogosSalvos();
 }
 
-window.onload = verificarJogoSalvo;
+window.addEventListener("load", verificarJogosSalvos);

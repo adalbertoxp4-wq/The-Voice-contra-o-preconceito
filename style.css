@@ -542,23 +542,22 @@ footer p {
 .jogo-salvo span { color: #455a64; font-size: 15px; line-height: 1.5; }
 .jogo-salvo button { margin-top: 6px; }
 
-/* Ajustes das 4 alternativas: o tamanho não entrega a resposta. */
-.alternativa {
+/* Correção: todas as alternativas ocupam a mesma largura e têm altura mínima,
+   evitando que o tamanho revele qual é a resposta correta. */
+#alternativas .alternativa {
     width: 100%;
-    min-height: 82px;
+    min-height: 92px;
     box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    text-align: left;
     line-height: 1.45;
 }
 
-.alternativa strong {
-    display: inline-block;
-    min-width: 28px;
+#alternativas .alternativa.correta {
+    border-width: 3px;
 }
 
-.alternativa:disabled {
-    opacity: 1;
-}
-
-#pergunta {
-    white-space: pre-line;
+#alternativas .alternativa.errada {
+    opacity: 0.9;
 }

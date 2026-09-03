@@ -1,5 +1,5 @@
 // ======================================================
-// JUNTOS CONTRA O PRECONCEITO
+// JUNTOS CONTRA O BULLYING
 // 2 jogos | 150 perguntas cada | 15 fases | 10 por fase
 // SEM VIDAS E SEM CRONÔMETRO
 // ======================================================
@@ -340,16 +340,18 @@ function gerarPerguntas(temas) {
             indice < 90 ? 15 :
             indice < 120 ? 20 : 25;
 
-        // Mantém a pontuação da resposta correta.
+        // Atualiza os pontos sem alterar qual alternativa é a correta.
         questao.alternativas = questao.alternativas.map(([texto, valor]) => [
             texto,
             valor > 0 ? pontosProgressivos : 0
         ]);
 
-        // IMPORTANTE: a alternativa correta não pode ser identificada pelo tamanho.
-        // Se ela ficar sendo a maior, aumentamos uma alternativa errada com uma
-        // continuação natural. Assim, o jogador precisa realmente analisar a questão.
-        questao.alternativas = equilibrarTamanhoAlternativas(questao.alternativas);
+        // Evita a "dica" de que a alternativa mais comprida é sempre a correta.
+        // Em parte das questões, deixamos uma alternativa errada um pouco mais
+        // detalhada, mantendo seu sentido incorreto.
+        if (indice % 2 === 0) {
+            questao.alternativas = equilibrarTamanhoAlternativas(questao.alternativas);
+        }
     });
 
     return resultado;
@@ -365,40 +367,26 @@ const perguntasInclusao = gerarPerguntas(temasInclusao);
 
 function equilibrarTamanhoAlternativas(alternativas) {
 
-    const opcoes = alternativas.map(([texto, valor]) => ({ texto, valor }));
-    const correta = opcoes.find(opcao => opcao.valor > 0);
-    const erradas = opcoes.filter(opcao => opcao.valor === 0);
+    const copia = alternativas.map(([texto, valor]) => [texto, valor]);
+    const correta = copia.findIndex(([, valor]) => valor > 0);
+    const erradas = copia
+        .map((item, indice) => ({ item, indice }))
+        .filter(({ item }) => item[1] === 0);
 
-    if (!correta || erradas.length === 0) return alternativas;
+    if (correta === -1 || erradas.length === 0) return copia;
 
-    const maiorErrada = erradas.reduce((maior, atual) =>
-        atual.texto.length > maior.texto.length ? atual : maior
-    );
+    const tamanhoCorreta = copia[correta][0].length;
+    const maiorErrada = Math.max(...erradas.map(({ item }) => item[0].length));
 
-    // Não deixamos a resposta correta ser sempre a maior alternativa.
-    if (correta.texto.length >= maiorErrada.texto.length) {
-        const complementos = [
-            " mesmo quando a situação parece uma simples brincadeira.",
-            " porque essa atitude pode afetar a outra pessoa e piorar o problema.",
-            " mesmo que outras pessoas do grupo digam que não há nada de errado.",
-            " considerando também as consequências para quem está sendo afetado.",
-            " especialmente quando isso acontece repetidamente ou diante de outras pessoas."
-        ];
-
-        const complemento = complementos[
-            Math.floor(Math.random() * complementos.length)
-        ];
-
-        maiorErrada.texto += complemento;
+    // Só mexe quando a correta é claramente a maior.
+    if (tamanhoCorreta > maiorErrada + 8) {
+        const alvo = erradas[0].indice;
+        copia[alvo][0] += " Essa escolha não resolve o problema.";
     }
 
-    return opcoes.map(opcao => [opcao.texto, opcao.valor]);
+    return copia;
 }
 
-
-// ======================================================
-// EMBARALHAR
-// ======================================================
 
 function embaralhar(array) {
 

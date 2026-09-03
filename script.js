@@ -154,42 +154,197 @@ const temasInclusao = [
 // ======================================================
 
 const modelos = [
-    "Qual atitude é mais adequada quando o assunto é ASSUNTO?",
-    "Qual comportamento demonstra respeito em uma situação de ASSUNTO?",
-    "O que devemos fazer para agir corretamente diante de ASSUNTO?",
-    "Qual escolha ajuda a combater problemas relacionados a ASSUNTO?",
-    "Como uma pessoa pode demonstrar empatia nesse caso de ASSUNTO?",
-    "Qual atitude contribui para uma convivência saudável em relação a ASSUNTO?",
-    "O que deve ser valorizado quando falamos sobre ASSUNTO?",
-    "Qual comportamento evita uma situação de discriminação relacionada a ASSUNTO?",
-    "Como agir de maneira responsável diante de ASSUNTO?",
-    "Qual decisão demonstra cidadania quando enfrentamos ASSUNTO?",
-    "O que pode ajudar uma pessoa envolvida em uma situação de ASSUNTO?",
-    "Qual atitude promove respeito e segurança em relação a ASSUNTO?",
-    "Como podemos melhorar a convivência quando existe uma situação de ASSUNTO?",
-    "Qual comportamento mostra que valorizamos a dignidade das pessoas em relação a ASSUNTO?",
-    "Qual é a melhor escolha diante de uma situação envolvendo ASSUNTO?"
+    {
+        nivel: 1,
+        nome: "Iniciante",
+        pontos: 10,
+        texto: "Em uma situação de ASSUNTO, qual atitude é mais respeitosa?",
+        errada1: "Fingir que não percebeu o problema e seguir normalmente.",
+        errada2: "Fazer uma brincadeira para tentar deixar a situação mais leve."
+    },
+    {
+        nivel: 1,
+        nome: "Iniciante",
+        pontos: 10,
+        texto: "Uma pessoa está passando por uma situação de ASSUNTO. O que ajuda mais?",
+        errada1: "Esperar que ela resolva tudo sozinha, mesmo pedindo ajuda.",
+        errada2: "Comentar o caso com outras pessoas antes de procurar ajuda."
+    },
+    {
+        nivel: 1,
+        nome: "Iniciante",
+        pontos: 10,
+        texto: "Qual escolha demonstra respeito quando falamos sobre ASSUNTO?",
+        errada1: "Evitar a pessoa para não se envolver com o problema.",
+        errada2: "Usar a situação para ganhar atenção entre os colegas."
+    },
+    {
+        nivel: 2,
+        nome: "Fácil",
+        pontos: 10,
+        texto: "Você presencia uma situação de ASSUNTO e percebe que a pessoa ficou constrangida. Qual é a melhor reação?",
+        errada1: "Perguntar em público detalhes da situação para entender melhor.",
+        errada2: "Esperar que outras pessoas tomem uma atitude primeiro."
+    },
+    {
+        nivel: 2,
+        nome: "Fácil",
+        pontos: 10,
+        texto: "Qual comportamento contribui para prevenir uma situação de ASSUNTO antes que ela se agrave?",
+        errada1: "Tratar comentários ofensivos como algo normal entre colegas.",
+        errada2: "Intervir apenas quando o problema já tiver causado consequências."
+    },
+    {
+        nivel: 2,
+        nome: "Fácil",
+        pontos: 10,
+        texto: "Um colega pede sua ajuda diante de ASSUNTO. Qual resposta é mais adequada?",
+        errada1: "Dizer que o problema não é seu e que ele deve resolver sozinho.",
+        errada2: "Oferecer ajuda sem ouvir o que a pessoa realmente precisa."
+    },
+    {
+        nivel: 3,
+        nome: "Intermediário",
+        pontos: 15,
+        texto: "Em um grupo, alguém sugere uma atitude relacionada a ASSUNTO que pode prejudicar outra pessoa. O que você deve considerar antes de concordar?",
+        errada1: "Se a maioria do grupo concorda, mesmo que alguém seja prejudicado.",
+        errada2: "Se a situação pode render uma boa piada ou receber muitas curtidas."
+    },
+    {
+        nivel: 3,
+        nome: "Intermediário",
+        pontos: 15,
+        texto: "Uma situação de ASSUNTO parece uma brincadeira para alguns, mas incomoda repetidamente uma pessoa. Qual análise é mais adequada?",
+        errada1: "Se algumas pessoas estão rindo, então não existe problema.",
+        errada2: "Se não houve agressão física, a situação nunca pode ser grave."
+    },
+    {
+        nivel: 3,
+        nome: "Intermediário",
+        pontos: 15,
+        texto: "Ao tentar resolver um caso de ASSUNTO, por que é importante ouvir a pessoa afetada?",
+        errada1: "Porque a versão dela deve ser aceita automaticamente sem verificar mais nada.",
+        errada2: "Porque ouvir a pessoa permite decidir por ela o que deve acontecer."
+    },
+    {
+        nivel: 3,
+        nome: "Intermediário",
+        pontos: 15,
+        texto: "Qual situação exige mais cuidado ao lidar com ASSUNTO?",
+        errada1: "Uma situação em que ninguém demonstrou desconforto, então não é preciso conversar.",
+        errada2: "Uma situação em que o grupo decidiu resolver o problema expondo a pessoa publicamente."
+    },
+    {
+        nivel: 4,
+        nome: "Difícil",
+        pontos: 20,
+        texto: "Considere este caso: uma pessoa pratica ASSUNTO contra outra, mas afirma que era apenas uma brincadeira. Qual critério é mais importante para avaliar a situação?",
+        errada1: "A intenção de quem praticou a ação, independentemente do efeito causado.",
+        errada2: "A opinião da maioria dos espectadores sobre se a brincadeira foi engraçada."
+    },
+    {
+        nivel: 4,
+        nome: "Difícil",
+        pontos: 20,
+        texto: "Uma escola quer enfrentar ASSUNTO de forma preventiva. Qual medida tende a ser mais eficaz?",
+        errada1: "Criar regras apenas depois que um caso grave acontecer.",
+        errada2: "Punir todos os envolvidos da mesma maneira sem investigar o contexto."
+    },
+    {
+        nivel: 4,
+        nome: "Difícil",
+        pontos: 20,
+        texto: "Em um conflito envolvendo ASSUNTO, qual atitude evita transformar a vítima em responsável pelo problema?",
+        errada1: "Perguntar por que ela não reagiu ou não se defendeu antes.",
+        errada2: "Orientá-la a ignorar tudo para impedir que o caso ganhe importância."
+    },
+    {
+        nivel: 5,
+        nome: "Muito difícil",
+        pontos: 25,
+        texto: "Analise: uma atitude relacionada a ASSUNTO não contém uma ofensa explícita, mas cria uma desvantagem repetida para determinada pessoa. Qual princípio deve orientar a avaliação?",
+        errada1: "Só existe discriminação quando alguém declara claramente uma intenção de discriminar.",
+        errada2: "Uma prática é aceitável se sempre foi utilizada pela maioria das pessoas."
+    },
+    {
+        nivel: 5,
+        nome: "Muito difícil",
+        pontos: 25,
+        texto: "Em uma situação complexa de ASSUNTO, duas pessoas apresentam versões diferentes. Qual procedimento é mais responsável?",
+        errada1: "Escolher imediatamente o lado de quem tem mais amigos ou influência no grupo.",
+        errada2: "Publicar as duas versões para que os colegas decidam quem está certo."
+    },
+    {
+        nivel: 6,
+        nome: "Desafio máximo",
+        pontos: 30,
+        texto: "Uma ação relacionada a ASSUNTO parece neutra, mas seus efeitos atingem muito mais um determinado grupo. Qual conceito ajuda a perceber esse problema?",
+        errada1: "Se a regra é igual para todos no papel, seus efeitos necessariamente também são iguais.",
+        errada2: "Apenas atitudes feitas com intenção explícita podem produzir desigualdade."
+    }
 ];
+
+function obterPontuacaoPorNivel(nivel) {
+    if (nivel <= 2) return 10;
+    if (nivel === 3) return 15;
+    if (nivel === 4) return 20;
+    if (nivel === 5) return 25;
+    return 30;
+}
 
 function gerarPerguntas(temas) {
 
     const resultado = [];
 
+    // Cada tema recebe as 15 dificuldades.
+    // Depois ordenamos pelo nível para a dificuldade crescer ao longo do jogo.
     temas.forEach(tema => {
-
         modelos.forEach(modelo => {
 
             resultado.push({
-                pergunta: modelo.replace("ASSUNTO", tema.assunto),
+                pergunta: modelo.texto.replace("ASSUNTO", tema.assunto),
+                nivel: modelo.nivel,
+                nomeNivel: modelo.nome,
                 alternativas: [
-                    [tema.correta, 10],
-                    [tema.errada1, 0],
-                    [tema.errada2, 0]
+                    [tema.correta, obterPontuacaoPorNivel(modelo.nivel)],
+                    [modelo.errada1, 0],
+                    [modelo.errada2, 0]
                 ]
             });
 
         });
+    });
 
+    resultado.sort((a, b) => a.nivel - b.nivel);
+
+    // A dificuldade agora é progressiva ao longo das 150 perguntas.
+    // O conteúdo sobe de nível e os pontos aumentam conforme o jogador avança.
+    resultado.forEach((questao, indice) => {
+        questao.numeroDificuldade = indice + 1;
+
+        if (indice < 30) {
+            questao.nomeNivel = "🟢 Iniciante";
+        } else if (indice < 60) {
+            questao.nomeNivel = "🟡 Intermediário";
+        } else if (indice < 90) {
+            questao.nomeNivel = "🟠 Difícil";
+        } else if (indice < 120) {
+            questao.nomeNivel = "🔴 Muito difícil";
+        } else {
+            questao.nomeNivel = "🟣 Desafio máximo";
+        }
+
+        const pontosProgressivos =
+            indice < 30 ? 10 :
+            indice < 60 ? 12 :
+            indice < 90 ? 15 :
+            indice < 120 ? 20 : 25;
+
+        // Atualiza apenas a alternativa correta.
+        questao.alternativas = questao.alternativas.map(([texto, valor]) => [
+            texto,
+            valor > 0 ? pontosProgressivos : 0
+        ]);
     });
 
     return resultado;
@@ -303,11 +458,9 @@ function selecionarJogo(tipo) {
     respostaDada = false;
 
     perguntasDoJogo =
-        embaralhar(
-            tipo === "bullying"
-                ? perguntasBullying
-                : perguntasInclusao
-        );
+        [...(tipo === "bullying"
+            ? perguntasBullying
+            : perguntasInclusao)];
 
     document.getElementById("inicio")
         .classList.add("escondido");
@@ -358,13 +511,16 @@ function mostrarPergunta() {
         .textContent =
         `Pergunta ${perguntaNaFase} de ${PERGUNTAS_POR_FASE}`;
 
-    document.getElementById("pontuacao")
-        .textContent =
-        `⭐ Pontos: ${pontos}`;
+    // Mostra o nível atual e deixa claro que a dificuldade aumenta.
+    const numeroDesafio = pergunta.numeroDificuldade || (perguntaAtual + 1);
 
     document.getElementById("progressoTexto")
         .textContent =
-        `Fase ${fase} — ${respondidas} de 10 respondidas`;
+        `Fase ${fase} — ${respondidas} de 10 respondidas — 🔥 ${pergunta.nomeNivel} — Desafio ${numeroDesafio}/150`;
+
+    document.getElementById("pontuacao")
+        .textContent =
+        `⭐ Pontos: ${pontos}`;
 
     document.getElementById("tituloJogo")
         .textContent =
@@ -394,7 +550,7 @@ function mostrarPergunta() {
     const opcoes =
         embaralhar(pergunta.alternativas);
 
-    opcoes.forEach(([texto, valor]) => {
+    opcoes.forEach(([texto, valor], indice) => {
 
         const botao =
             document.createElement("button");
@@ -403,7 +559,7 @@ function mostrarPergunta() {
             "alternativa";
 
         botao.textContent =
-            texto;
+            `${String.fromCharCode(65 + indice)}) ${texto}`;
 
         botao.onclick =
             () => escolherResposta(botao, valor);
@@ -467,6 +623,9 @@ function escolherResposta(botaoEscolhido, valor) {
     document.getElementById("pontuacao")
         .textContent =
         `⭐ Pontos: ${pontos}`;
+
+    // Salva também depois da resposta para não perder o progresso.
+    salvarProgresso();
 
     criarBotaoProxima();
 }

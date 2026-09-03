@@ -541,3 +541,37 @@ footer p {
 .jogo-salvo strong { color: #6a1b9a; font-size: 18px; }
 .jogo-salvo span { color: #455a64; font-size: 15px; line-height: 1.5; }
 .jogo-salvo button { margin-top: 6px; }
+
+/* Correções das alternativas */
+.alternativa {
+    min-height: 86px;
+    width: 100%;
+    line-height: 1.45;
+    display: flex;
+    align-items: center;
+}
+
+.alternativa.resposta-certa {
+    border-color: #2e7d32;
+    background: #e8f5e9;
+}
+
+.alternativa.resposta-errada {
+    border-color: #c62828;
+    background: #ffebee;
+}
+
+.jogo-salvo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 18px;
+    margin: 12px 0;
+    background: white;
+    border: 2px solid #8e24aa;
+    border-radius: 14px;
+}
+
+.jogo-salvo span {
+    color: #546e7a;
+}

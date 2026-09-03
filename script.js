@@ -1,8 +1,8 @@
-// ======================================================
+// ============================================================
 // JUNTOS CONTRA O BULLYING
-// 2 jogos | 150 perguntas cada | 15 fases | 10 por fase
-// SEM VIDAS E SEM CRONÔMETRO
-// ======================================================
+// 2 jogos | 150 perguntas por jogo | 300 no total
+// Dificuldade progressiva | progresso separado por jogo
+// ============================================================
 
 const TOTAL_PERGUNTAS = 150;
 const PERGUNTAS_POR_FASE = 10;
@@ -16,972 +16,434 @@ let respostaDada = false;
 let somAtivo = true;
 let audioContext = null;
 
+const niveis = [
+    { nome: "🟢 Iniciante", pontos: 10 },
+    { nome: "🟡 Básico", pontos: 10 },
+    { nome: "🟠 Intermediário", pontos: 15 },
+    { nome: "🔴 Difícil", pontos: 20 },
+    { nome: "🟣 Muito difícil", pontos: 25 },
+    { nome: "🔥 Desafio máximo", pontos: 30 }
+];
 
-// ======================================================
-// BANCO DE TEMAS
-// 10 temas x 15 variações = 150 perguntas por jogo
-// ======================================================
-
+// Cada jogo possui 10 temas x 15 situações diferentes = 150 perguntas.
 const temasBullying = [
-    {
-        assunto: "bullying",
-        correta: "Apoiar a vítima e procurar ajuda de um adulto de confiança.",
-        errada1: "Ignorar a situação e deixar a agressão continuar.",
-        errada2: "Participar da agressão para tentar se enturmar."
-    },
-    {
-        assunto: "cyberbullying",
-        correta: "Guardar as provas, não revidar e procurar ajuda.",
-        errada1: "Responder com outra ofensa.",
-        errada2: "Compartilhar a mensagem ofensiva com mais pessoas."
-    },
-    {
-        assunto: "empatia",
-        correta: "Ouvir a pessoa e tentar compreender o que ela está sentindo.",
-        errada1: "Dizer que o sentimento dela não importa.",
-        errada2: "Fazer piada com o problema."
-    },
-    {
-        assunto: "exclusão",
-        correta: "Convidar a pessoa para participar e tratá-la com respeito.",
-        errada1: "Impedir que ela participe de propósito.",
-        errada2: "Fazer comentários para deixá-la constrangida."
-    },
-    {
-        assunto: "apelidos ofensivos",
-        correta: "Parar de usar o apelido e respeitar o nome da pessoa.",
-        errada1: "Continuar usando mesmo depois de ela pedir para parar.",
-        errada2: "Criar um apelido ainda mais ofensivo."
-    },
-    {
-        assunto: "respeito",
-        correta: "Tratar as pessoas com educação mesmo quando pensamos diferente.",
-        errada1: "Humilhar quem possui uma opinião diferente.",
-        errada2: "Usar diferenças pessoais para ofender."
-    },
-    {
-        assunto: "testemunha",
-        correta: "Apoiar a vítima e comunicar o ocorrido a alguém responsável.",
-        errada1: "Filmar a agressão para publicar nas redes.",
-        errada2: "Incentivar os envolvidos a continuar brigando."
-    },
-    {
-        assunto: "preconceito",
-        correta: "Questionar estereótipos e conhecer as pessoas sem julgamentos.",
-        errada1: "Julgar alguém apenas pela aparência.",
-        errada2: "Espalhar estereótipos como se fossem verdades."
-    },
-    {
-        assunto: "diferenças",
-        correta: "Valorizar as diferenças e tratar todos com dignidade.",
-        errada1: "Afastar alguém por ser diferente.",
-        errada2: "Usar uma característica da pessoa para ridicularizá-la."
-    },
-    {
-        assunto: "escola",
-        correta: "Promover diálogo, respeito e comunicar situações de agressão.",
-        errada1: "Esconder agressões para evitar problemas.",
-        errada2: "Dizer que bullying é apenas brincadeira."
-    }
+    ["bullying", "uma colega está sendo humilhada repetidamente por causa de sua aparência"],
+    ["cyberbullying", "um estudante recebe mensagens ofensivas em um grupo da turma"],
+    ["apelidos ofensivos", "um colega pede várias vezes para que parem de chamá-lo por um apelido"],
+    ["exclusão", "uma pessoa é deixada de fora de uma atividade de propósito"],
+    ["testemunha", "você presencia colegas ridicularizando outro estudante"],
+    ["empatia", "um colega demonstra estar abalado depois de sofrer uma agressão verbal"],
+    ["respeito", "duas pessoas discordam sobre uma opinião e a discussão começa a ficar agressiva"],
+    ["preconceito", "um estudante é julgado antes mesmo de ser conhecido"],
+    ["segurança digital", "uma imagem constrangedora de um colega começa a circular pela internet"],
+    ["convivência escolar", "a turma precisa criar maneiras de tornar o ambiente mais acolhedor"]
 ];
 
 const temasInclusao = [
-    {
-        assunto: "deficiência",
-        correta: "Tratar a pessoa com respeito e perguntar se ela precisa de ajuda.",
-        errada1: "Decidir por ela sem perguntar o que deseja.",
-        errada2: "Fazer comentários ofensivos sobre sua deficiência."
-    },
-    {
-        assunto: "acessibilidade",
-        correta: "Garantir que pessoas diferentes possam participar com autonomia e segurança.",
-        errada1: "Bloquear rampas e caminhos acessíveis.",
-        errada2: "Retirar recursos de acessibilidade sem necessidade."
-    },
-    {
-        assunto: "capacitismo",
-        correta: "Respeitar a autonomia e combater atitudes discriminatórias.",
-        errada1: "Considerar uma pessoa incapaz apenas por ter deficiência.",
-        errada2: "Fazer piadas sobre deficiência."
-    },
-    {
-        assunto: "autismo",
-        correta: "Respeitar as necessidades, a comunicação e a individualidade da pessoa.",
-        errada1: "Forçar a pessoa a agir exatamente como todos os outros.",
-        errada2: "Fazer piadas sobre características do autismo."
-    },
-    {
-        assunto: "idosos",
-        correta: "Respeitar a autonomia, ouvir e oferecer ajuda quando necessário.",
-        errada1: "Tratar toda pessoa idosa como incapaz.",
-        errada2: "Ignorar sua opinião."
-    },
-    {
-        assunto: "cadeira de rodas",
-        correta: "Não tocar ou movimentar a cadeira sem autorização.",
-        errada1: "Empurrar a cadeira sem perguntar.",
-        errada2: "Usar a cadeira como apoio ou brincadeira."
-    },
-    {
-        assunto: "linguagem respeitosa",
-        correta: "Usar palavras respeitosas e evitar termos ofensivos.",
-        errada1: "Usar apelidos humilhantes.",
-        errada2: "Fazer piadas com características pessoais."
-    },
-    {
-        assunto: "inclusão",
-        correta: "Criar condições para que todos possam participar.",
-        errada1: "Excluir quem precisa de adaptação.",
-        errada2: "Impedir a participação de alguém por causa de uma diferença."
-    },
-    {
-        assunto: "equidade",
-        correta: "Oferecer os recursos necessários para que todos tenham oportunidades justas.",
-        errada1: "Dar exatamente o mesmo recurso sem considerar necessidades.",
-        errada2: "Recusar adaptações necessárias."
-    },
-    {
-        assunto: "diversidade",
-        correta: "Conhecer, ouvir e respeitar pessoas com diferentes características.",
-        errada1: "Julgar alguém antes de conhecê-lo.",
-        errada2: "Afastar pessoas que não se encaixam em um padrão."
-    }
+    ["deficiência", "uma pessoa com deficiência participa de uma atividade da escola"],
+    ["acessibilidade", "a escola precisa garantir acesso seguro aos seus diferentes espaços"],
+    ["capacitismo", "um colega presume que uma pessoa com deficiência não consegue realizar uma tarefa"],
+    ["autismo", "um estudante autista precisa de respeito às suas necessidades e à sua forma de comunicação"],
+    ["cadeira de rodas", "uma pessoa utiliza cadeira de rodas para se locomover pela escola"],
+    ["comunicação", "um colega utiliza uma forma diferente de comunicação para participar da aula"],
+    ["idosos", "uma pessoa idosa participa de uma atividade junto com pessoas mais jovens"],
+    ["equidade", "uma atividade precisa de adaptações para que todos tenham condições de participar"],
+    ["diversidade", "uma turma reúne pessoas com características, experiências e modos de pensar diferentes"],
+    ["inclusão", "um grupo precisa decidir como garantir a participação de todos em uma atividade"]
 ];
 
-
-// ======================================================
-// CRIA 150 PERGUNTAS
-// ======================================================
-
+// 15 estruturas diferentes. O assunto/situação muda em cada tema,
+// portanto as 150 perguntas de cada jogo não são cópias da mesma questão.
 const modelos = [
-    {
-        nivel: 1,
-        nome: "Iniciante",
-        pontos: 10,
-        texto: "Em uma situação de ASSUNTO, qual atitude é mais respeitosa?",
-        errada1: "Fingir que não percebeu o problema e seguir normalmente.",
-        errada2: "Fazer uma brincadeira para tentar deixar a situação mais leve."
-    },
-    {
-        nivel: 1,
-        nome: "Iniciante",
-        pontos: 10,
-        texto: "Uma pessoa está passando por uma situação de ASSUNTO. O que ajuda mais?",
-        errada1: "Esperar que ela resolva tudo sozinha, mesmo pedindo ajuda.",
-        errada2: "Comentar o caso com outras pessoas antes de procurar ajuda."
-    },
-    {
-        nivel: 1,
-        nome: "Iniciante",
-        pontos: 10,
-        texto: "Qual escolha demonstra respeito quando falamos sobre ASSUNTO?",
-        errada1: "Evitar a pessoa para não se envolver com o problema.",
-        errada2: "Usar a situação para ganhar atenção entre os colegas."
-    },
-    {
-        nivel: 2,
-        nome: "Fácil",
-        pontos: 10,
-        texto: "Você presencia uma situação de ASSUNTO e percebe que a pessoa ficou constrangida. Qual é a melhor reação?",
-        errada1: "Perguntar em público detalhes da situação para entender melhor.",
-        errada2: "Esperar que outras pessoas tomem uma atitude primeiro."
-    },
-    {
-        nivel: 2,
-        nome: "Fácil",
-        pontos: 10,
-        texto: "Qual comportamento contribui para prevenir uma situação de ASSUNTO antes que ela se agrave?",
-        errada1: "Tratar comentários ofensivos como algo normal entre colegas.",
-        errada2: "Intervir apenas quando o problema já tiver causado consequências."
-    },
-    {
-        nivel: 2,
-        nome: "Fácil",
-        pontos: 10,
-        texto: "Um colega pede sua ajuda diante de ASSUNTO. Qual resposta é mais adequada?",
-        errada1: "Dizer que o problema não é seu e que ele deve resolver sozinho.",
-        errada2: "Oferecer ajuda sem ouvir o que a pessoa realmente precisa."
-    },
-    {
-        nivel: 3,
-        nome: "Intermediário",
-        pontos: 15,
-        texto: "Em um grupo, alguém sugere uma atitude relacionada a ASSUNTO que pode prejudicar outra pessoa. O que você deve considerar antes de concordar?",
-        errada1: "Se a maioria do grupo concorda, mesmo que alguém seja prejudicado.",
-        errada2: "Se a situação pode render uma boa piada ou receber muitas curtidas."
-    },
-    {
-        nivel: 3,
-        nome: "Intermediário",
-        pontos: 15,
-        texto: "Uma situação de ASSUNTO parece uma brincadeira para alguns, mas incomoda repetidamente uma pessoa. Qual análise é mais adequada?",
-        errada1: "Se algumas pessoas estão rindo, então não existe problema.",
-        errada2: "Se não houve agressão física, a situação nunca pode ser grave."
-    },
-    {
-        nivel: 3,
-        nome: "Intermediário",
-        pontos: 15,
-        texto: "Ao tentar resolver um caso de ASSUNTO, por que é importante ouvir a pessoa afetada?",
-        errada1: "Porque a versão dela deve ser aceita automaticamente sem verificar mais nada.",
-        errada2: "Porque ouvir a pessoa permite decidir por ela o que deve acontecer."
-    },
-    {
-        nivel: 3,
-        nome: "Intermediário",
-        pontos: 15,
-        texto: "Qual situação exige mais cuidado ao lidar com ASSUNTO?",
-        errada1: "Uma situação em que ninguém demonstrou desconforto, então não é preciso conversar.",
-        errada2: "Uma situação em que o grupo decidiu resolver o problema expondo a pessoa publicamente."
-    },
-    {
-        nivel: 4,
-        nome: "Difícil",
-        pontos: 20,
-        texto: "Considere este caso: uma pessoa pratica ASSUNTO contra outra, mas afirma que era apenas uma brincadeira. Qual critério é mais importante para avaliar a situação?",
-        errada1: "A intenção de quem praticou a ação, independentemente do efeito causado.",
-        errada2: "A opinião da maioria dos espectadores sobre se a brincadeira foi engraçada."
-    },
-    {
-        nivel: 4,
-        nome: "Difícil",
-        pontos: 20,
-        texto: "Uma escola quer enfrentar ASSUNTO de forma preventiva. Qual medida tende a ser mais eficaz?",
-        errada1: "Criar regras apenas depois que um caso grave acontecer.",
-        errada2: "Punir todos os envolvidos da mesma maneira sem investigar o contexto."
-    },
-    {
-        nivel: 4,
-        nome: "Difícil",
-        pontos: 20,
-        texto: "Em um conflito envolvendo ASSUNTO, qual atitude evita transformar a vítima em responsável pelo problema?",
-        errada1: "Perguntar por que ela não reagiu ou não se defendeu antes.",
-        errada2: "Orientá-la a ignorar tudo para impedir que o caso ganhe importância."
-    },
-    {
-        nivel: 5,
-        nome: "Muito difícil",
-        pontos: 25,
-        texto: "Analise: uma atitude relacionada a ASSUNTO não contém uma ofensa explícita, mas cria uma desvantagem repetida para determinada pessoa. Qual princípio deve orientar a avaliação?",
-        errada1: "Só existe discriminação quando alguém declara claramente uma intenção de discriminar.",
-        errada2: "Uma prática é aceitável se sempre foi utilizada pela maioria das pessoas."
-    },
-    {
-        nivel: 5,
-        nome: "Muito difícil",
-        pontos: 25,
-        texto: "Em uma situação complexa de ASSUNTO, duas pessoas apresentam versões diferentes. Qual procedimento é mais responsável?",
-        errada1: "Escolher imediatamente o lado de quem tem mais amigos ou influência no grupo.",
-        errada2: "Publicar as duas versões para que os colegas decidam quem está certo."
-    },
-    {
-        nivel: 6,
-        nome: "Desafio máximo",
-        pontos: 30,
-        texto: "Uma ação relacionada a ASSUNTO parece neutra, mas seus efeitos atingem muito mais um determinado grupo. Qual conceito ajuda a perceber esse problema?",
-        errada1: "Se a regra é igual para todos no papel, seus efeitos necessariamente também são iguais.",
-        errada2: "Apenas atitudes feitas com intenção explícita podem produzir desigualdade."
-    }
+    (s) => `Qual é a atitude mais adequada diante de ${s}?`,
+    (s) => `Você percebe ${s}. Qual deve ser sua primeira preocupação?`,
+    (s) => `Se você estiver envolvido em ${s}, qual escolha demonstra respeito?`,
+    (s) => `Um colega pede ajuda porque ${s}. Qual resposta é mais responsável?`,
+    (s) => `Ao observar ${s}, qual comportamento ajuda a evitar que o problema aumente?`,
+    (s) => `Por que é importante levar a sério uma situação em que ${s}?`,
+    (s) => `Qual alternativa apresenta uma forma de agir com empatia quando ${s}?`,
+    (s) => `Em uma escola, qual medida pode contribuir para enfrentar uma situação em que ${s}?`,
+    (s) => `Se outras pessoas estiverem incentivando ${s}, como você deve agir?`,
+    (s) => `Qual análise é mais justa quando ${s}?`,
+    (s) => `Em uma conversa sobre ${s}, qual princípio deve orientar sua decisão?`,
+    (s) => `Imagine que ninguém sabe como resolver ${s}. Qual é a atitude mais segura?`,
+    (s) => `Uma pessoa diz que ${s} é apenas uma brincadeira. O que deve ser considerado?`,
+    (s) => `Qual atitude pode transformar uma situação em que ${s} em uma oportunidade de respeito?`,
+    (s) => `Em uma situação mais complexa envolvendo ${s}, qual escolha melhor protege a dignidade das pessoas?`
 ];
 
-function obterPontuacaoPorNivel(nivel) {
-    if (nivel <= 2) return 10;
-    if (nivel === 3) return 15;
-    if (nivel === 4) return 20;
-    if (nivel === 5) return 25;
-    return 30;
+const respostasPorTemaBullying = {
+    "bullying": [
+        "Apoiar a pessoa, interromper a participação na agressão e procurar um adulto de confiança.",
+        "Fingir que não viu para evitar qualquer envolvimento.",
+        "Rir junto para não se tornar o próximo alvo."
+    ],
+    "cyberbullying": [
+        "Guardar evidências, evitar revidar e buscar ajuda de um adulto ou responsável.",
+        "Responder com uma ofensa ainda mais forte.",
+        "Compartilhar a mensagem ofensiva para aumentar a exposição."
+    ],
+    "apelidos ofensivos": [
+        "Parar quando a pessoa demonstra incômodo e respeitar como ela deseja ser chamada.",
+        "Continuar porque outros colegas também usam o apelido.",
+        "Criar um apelido mais constrangedor para fazer graça."
+    ],
+    "exclusão": [
+        "Incluir a pessoa e verificar se existem formas de garantir sua participação.",
+        "Dizer que ela não faz parte do grupo e deve procurar outro lugar.",
+        "Convidá-la somente se isso não atrapalhar os planos dos demais."
+    ],
+    "testemunha": [
+        "Apoiar quem sofreu a agressão e comunicar o ocorrido a alguém responsável.",
+        "Filmar tudo para publicar depois nas redes sociais.",
+        "Incentivar a discussão para descobrir quem consegue humilhar mais."
+    ],
+    "empatia": [
+        "Ouvir sem ridicularizar, acolher e perguntar de que forma a pessoa precisa de apoio.",
+        "Dizer que existem problemas muito maiores e que ela deveria esquecer o assunto.",
+        "Fazer uma piada para tentar mudar o clima rapidamente."
+    ],
+    "respeito": [
+        "Discordar sem atacar a pessoa e ouvir argumentos diferentes dos seus.",
+        "Interromper a pessoa para mostrar que sua opinião é superior.",
+        "Usar características pessoais para tentar vencer a discussão."
+    ],
+    "preconceito": [
+        "Questionar julgamentos automáticos e conhecer a pessoa antes de tirar conclusões.",
+        "Aceitar estereótipos porque são repetidos por muitas pessoas.",
+        "Evitar contato com quem parece diferente para não ter problemas."
+    ],
+    "segurança digital": [
+        "Não redistribuir a imagem, preservar informações úteis e procurar ajuda responsável.",
+        "Salvar a imagem e enviá-la para amigos de confiança como curiosidade.",
+        "Publicar comentários para descobrir como outras pessoas reagirão."
+    ],
+    "convivência escolar": [
+        "Criar regras de respeito, canais de apoio e formas de participação para a turma.",
+        "Esperar que os conflitos desapareçam sem conversar sobre eles.",
+        "Punir toda a turma sem analisar as situações individualmente."
+    ]
+};
+
+const respostasPorTemaInclusao = {
+    "deficiência": [
+        "Perguntar se a pessoa precisa de ajuda e respeitar sua autonomia e suas escolhas.",
+        "Fazer tudo por ela sem perguntar, mesmo quando ela consegue realizar a tarefa sozinha.",
+        "Fazer comentários sobre sua deficiência para chamar a atenção dos colegas."
+    ],
+    "acessibilidade": [
+        "Garantir recursos e caminhos que permitam participação com autonomia e segurança.",
+        "Deixar os recursos acessíveis bloqueados quando não houver fiscalização.",
+        "Oferecer acesso apenas quando a pessoa reclamar do problema."
+    ],
+    "capacitismo": [
+        "Evitar pressupor incapacidade e avaliar a pessoa pelo que ela realmente consegue fazer.",
+        "Decidir antecipadamente que ela não será capaz de realizar a atividade.",
+        "Usar a deficiência como motivo para fazer piadas durante a tarefa."
+    ],
+    "autismo": [
+        "Respeitar necessidades individuais, comunicação, limites e diferentes formas de interação.",
+        "Forçar a pessoa a esconder comportamentos apenas para parecer igual aos demais.",
+        "Tratar todas as pessoas autistas como se tivessem exatamente as mesmas necessidades."
+    ],
+    "cadeira de rodas": [
+        "Perguntar antes de ajudar e nunca mover a cadeira sem autorização.",
+        "Empurrar a cadeira imediatamente porque parece ser mais rápido.",
+        "Usar a cadeira como apoio para mochila ou brincadeira."
+    ],
+    "comunicação": [
+        "Dar tempo, utilizar recursos adequados e respeitar a forma de comunicação da pessoa.",
+        "Completar todas as frases pela pessoa para acelerar a conversa.",
+        "Ignorar sua participação porque sua comunicação é diferente."
+    ],
+    "idosos": [
+        "Respeitar sua autonomia, ouvir suas decisões e oferecer ajuda quando for desejada.",
+        "Assumir que toda pessoa idosa precisa que alguém decida por ela.",
+        "Ignorar sua opinião porque pessoas mais jovens sabem mais sobre tudo."
+    ],
+    "equidade": [
+        "Oferecer os apoios necessários para que as pessoas tenham oportunidades realmente justas.",
+        "Dar exatamente o mesmo recurso mesmo quando as necessidades são diferentes.",
+        "Recusar adaptações para garantir que ninguém receba qualquer apoio adicional."
+    ],
+    "diversidade": [
+        "Valorizar diferenças, ouvir experiências e evitar julgamentos baseados em estereótipos.",
+        "Exigir que todos se comportem da mesma maneira para evitar diferenças.",
+        "Afastar quem não combina com os padrões predominantes do grupo."
+    ],
+    "inclusão": [
+        "Planejar a atividade considerando diferentes necessidades e garantindo participação real.",
+        "Convidar todos, mas ignorar qualquer adaptação necessária para participar.",
+        "Separar as pessoas que precisam de apoio para facilitar o trabalho dos demais."
+    ]
+};
+
+function embaralhar(array) {
+    const copia = [...array];
+    for (let i = copia.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copia[i], copia[j]] = [copia[j], copia[i]];
+    }
+    return copia;
 }
 
-function gerarPerguntas(temas) {
+function nivelDaPergunta(indice) {
+    if (indice < 25) return niveis[0];
+    if (indice < 50) return niveis[1];
+    if (indice < 80) return niveis[2];
+    if (indice < 110) return niveis[3];
+    if (indice < 135) return niveis[4];
+    return niveis[5];
+}
 
+function gerarPerguntas(temas, respostas) {
     const resultado = [];
-
-    // Cada tema recebe as 15 dificuldades.
-    // Depois ordenamos pelo nível para a dificuldade crescer ao longo do jogo.
-    temas.forEach(tema => {
-        modelos.forEach(modelo => {
-
+    temas.forEach(([tema, situacao], temaIndex) => {
+        modelos.forEach((modelo, modeloIndex) => {
+            const nivel = nivelDaPergunta(temaIndex * 15 + modeloIndex);
+            const base = respostas[tema];
             resultado.push({
-                pergunta: modelo.texto.replace("ASSUNTO", tema.assunto),
-                nivel: modelo.nivel,
-                nomeNivel: modelo.nome,
-                alternativas: [
-                    [tema.correta, obterPontuacaoPorNivel(modelo.nivel)],
-                    [modelo.errada1, 0],
-                    [modelo.errada2, 0]
-                ]
+                id: `${temaIndex + 1}-${modeloIndex + 1}`,
+                assunto: tema,
+                pergunta: modelo(situacao),
+                nivel: nivel.nome,
+                pontos: nivel.pontos,
+                alternativas: embaralhar([
+                    { texto: base[0], correta: true },
+                    { texto: base[1], correta: false },
+                    { texto: base[2], correta: false }
+                ])
             });
-
         });
     });
-
-    resultado.sort((a, b) => a.nivel - b.nivel);
-
-    // A dificuldade agora é progressiva ao longo das 150 perguntas.
-    // O conteúdo sobe de nível e os pontos aumentam conforme o jogador avança.
-    resultado.forEach((questao, indice) => {
-        questao.numeroDificuldade = indice + 1;
-
-        if (indice < 30) {
-            questao.nomeNivel = "🟢 Iniciante";
-        } else if (indice < 60) {
-            questao.nomeNivel = "🟡 Intermediário";
-        } else if (indice < 90) {
-            questao.nomeNivel = "🟠 Difícil";
-        } else if (indice < 120) {
-            questao.nomeNivel = "🔴 Muito difícil";
-        } else {
-            questao.nomeNivel = "🟣 Desafio máximo";
-        }
-
-        const pontosProgressivos =
-            indice < 30 ? 10 :
-            indice < 60 ? 12 :
-            indice < 90 ? 15 :
-            indice < 120 ? 20 : 25;
-
-        // Atualiza os pontos sem alterar qual alternativa é a correta.
-        questao.alternativas = questao.alternativas.map(([texto, valor]) => [
-            texto,
-            valor > 0 ? pontosProgressivos : 0
-        ]);
-
-        // Evita a "dica" de que a alternativa mais comprida é sempre a correta.
-        // Em parte das questões, deixamos uma alternativa errada um pouco mais
-        // detalhada, mantendo seu sentido incorreto.
-        if (indice % 2 === 0) {
-            questao.alternativas = equilibrarTamanhoAlternativas(questao.alternativas);
-        }
-    });
-
     return resultado;
 }
 
-const perguntasBullying = gerarPerguntas(temasBullying);
-const perguntasInclusao = gerarPerguntas(temasInclusao);
+const perguntasBullying = gerarPerguntas(temasBullying, respostasPorTemaBullying);
+const perguntasInclusao = gerarPerguntas(temasInclusao, respostasPorTemaInclusao);
 
-
-// ======================================================
-// EMBARALHAR
-// ======================================================
-
-function equilibrarTamanhoAlternativas(alternativas) {
-
-    const copia = alternativas.map(([texto, valor]) => [texto, valor]);
-    const correta = copia.findIndex(([, valor]) => valor > 0);
-    const erradas = copia
-        .map((item, indice) => ({ item, indice }))
-        .filter(({ item }) => item[1] === 0);
-
-    if (correta === -1 || erradas.length === 0) return copia;
-
-    const tamanhoCorreta = copia[correta][0].length;
-    const maiorErrada = Math.max(...erradas.map(({ item }) => item[0].length));
-
-    // Só mexe quando a correta é claramente a maior.
-    if (tamanhoCorreta > maiorErrada + 8) {
-        const alvo = erradas[0].indice;
-        copia[alvo][0] += " Essa escolha não resolve o problema.";
+// Garante que a alternativa correta não fique sempre na mesma posição.
+function embaralharAlternativasSemPadrão(alternativas) {
+    let nova = embaralhar(alternativas);
+    const correta = nova.findIndex(a => a.correta);
+    const anterior = window._ultimaPosicaoCorreta;
+    if (anterior !== undefined && correta === anterior) {
+        const alvo = (correta + 1 + Math.floor(Math.random() * 2)) % 3;
+        [nova[correta], nova[alvo]] = [nova[alvo], nova[correta]];
     }
-
-    return copia;
+    window._ultimaPosicaoCorreta = nova.findIndex(a => a.correta);
+    return nova;
 }
 
-
-function embaralhar(array) {
-
-    const copia = [...array];
-
-    for (let i = copia.length - 1; i > 0; i--) {
-
-        const j = Math.floor(Math.random() * (i + 1));
-
-        [copia[i], copia[j]] =
-        [copia[j], copia[i]];
-    }
-
-    return copia;
-}
-
-
-// ======================================================
+// ============================================================
 // SOM
-// ======================================================
-
+// ============================================================
 function tocarSom(frequencia, duracao = 0.1) {
-
     if (!somAtivo) return;
-
     try {
-
-        if (!audioContext) {
-
-            audioContext =
-                new (window.AudioContext ||
-                    window.webkitAudioContext)();
-
-        }
-
-        const oscilador =
-            audioContext.createOscillator();
-
-        const ganho =
-            audioContext.createGain();
-
-        oscilador.frequency.value =
-            frequencia;
-
+        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscilador = audioContext.createOscillator();
+        const ganho = audioContext.createGain();
+        oscilador.frequency.value = frequencia;
         oscilador.connect(ganho);
         ganho.connect(audioContext.destination);
-
-        ganho.gain.setValueAtTime(
-            0.08,
-            audioContext.currentTime
-        );
-
-        ganho.gain.exponentialRampToValueAtTime(
-            0.001,
-            audioContext.currentTime + duracao
-        );
-
+        ganho.gain.setValueAtTime(0.08, audioContext.currentTime);
+        ganho.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duracao);
         oscilador.start();
-
-        oscilador.stop(
-            audioContext.currentTime + duracao
-        );
-
-    } catch (erro) {
-        console.log("Som indisponível.");
-    }
+        oscilador.stop(audioContext.currentTime + duracao);
+    } catch (erro) {}
 }
 
 function alternarSom() {
-
     somAtivo = !somAtivo;
-
-    const botao =
-        document.querySelector(".botao-som");
-
-    botao.textContent =
-        somAtivo
-            ? "🔊 Som ativado"
-            : "🔇 Som desativado";
-
-    if (somAtivo) {
-        tocarSom(650);
-    }
+    const botao = document.querySelector(".botao-som");
+    if (botao) botao.textContent = somAtivo ? "🔊 Som ativado" : "🔇 Som desativado";
+    if (somAtivo) tocarSom(650);
 }
 
-
-// ======================================================
-// INICIAR JOGO
-// ======================================================
-
+// ============================================================
+// JOGO
+// ============================================================
 function selecionarJogo(tipo) {
-
     jogoAtual = tipo;
-
     perguntaAtual = 0;
-
     pontos = 0;
-
     respostaDada = false;
-
-    perguntasDoJogo =
-        [...(tipo === "bullying"
-            ? perguntasBullying
-            : perguntasInclusao)];
-
-    document.getElementById("inicio")
-        .classList.add("escondido");
-
-    document.getElementById("rankingTela")
-        .classList.add("escondido");
-
-    document.getElementById("resultado")
-        .classList.add("escondido");
-
-    document.getElementById("jogo")
-        .classList.remove("escondido");
-
+    window._ultimaPosicaoCorreta = undefined;
+    perguntasDoJogo = tipo === "bullying" ? embaralhar(perguntasBullying) : embaralhar(perguntasInclusao);
+    abrirTelaJogo();
+    salvarProgresso();
     tocarSom(700);
-
     mostrarPergunta();
 }
 
-
-// ======================================================
-// MOSTRAR PERGUNTA
-// ======================================================
-
-function mostrarPergunta() {
-
-    respostaDada = false;
-
-    const pergunta =
-        perguntasDoJogo[perguntaAtual];
-
-    const fase =
-        Math.floor(
-            perguntaAtual / PERGUNTAS_POR_FASE
-        ) + 1;
-
-    const perguntaNaFase =
-        (perguntaAtual %
-            PERGUNTAS_POR_FASE) + 1;
-
-    const respondidas =
-        perguntaAtual % PERGUNTAS_POR_FASE;
-
-    document.getElementById("faseAtual")
-        .textContent =
-        `🏁 Fase ${fase} de ${TOTAL_FASES}`;
-
-    document.getElementById("numeroPergunta")
-        .textContent =
-        `Pergunta ${perguntaNaFase} de ${PERGUNTAS_POR_FASE}`;
-
-    // Mostra o nível atual e deixa claro que a dificuldade aumenta.
-    const numeroDesafio = pergunta.numeroDificuldade || (perguntaAtual + 1);
-
-    document.getElementById("progressoTexto")
-        .textContent =
-        `Fase ${fase} — ${respondidas} de 10 respondidas — 🔥 ${pergunta.nomeNivel} — Desafio ${numeroDesafio}/150`;
-
-    document.getElementById("pontuacao")
-        .textContent =
-        `⭐ Pontos: ${pontos}`;
-
-    document.getElementById("tituloJogo")
-        .textContent =
-        jogoAtual === "bullying"
-            ? "🛡️ A Luta Contra o Bullying"
-            : "♿ Respeito às Diferenças";
-
-    document.getElementById("numeroBola")
-        .textContent =
-        perguntaNaFase;
-
-    document.getElementById("pergunta")
-        .textContent =
-        pergunta.pergunta;
-
-    document.getElementById("feedback")
-        .textContent = "";
-
-    document.getElementById("areaProxima")
-        .innerHTML = "";
-
-    const alternativas =
-        document.getElementById("alternativas");
-
-    alternativas.innerHTML = "";
-
-    const opcoes =
-        embaralhar(pergunta.alternativas);
-
-    opcoes.forEach(([texto, valor], indice) => {
-
-        const botao =
-            document.createElement("button");
-
-        botao.className =
-            "alternativa";
-
-        botao.textContent =
-            `${String.fromCharCode(65 + indice)}) ${texto}`;
-
-        botao.onclick =
-            () => escolherResposta(botao, valor);
-
-        alternativas.appendChild(botao);
-
-    });
-
-    const progresso =
-        (respondidas / PERGUNTAS_POR_FASE) * 100;
-
-    document.getElementById("progressoFase")
-        .style.width =
-        `${progresso}%`;
+function abrirTelaJogo() {
+    document.getElementById("inicio").classList.add("escondido");
+    document.getElementById("rankingTela").classList.add("escondido");
+    document.getElementById("resultado").classList.add("escondido");
+    document.getElementById("jogo").classList.remove("escondido");
 }
 
+function mostrarPergunta() {
+    respostaDada = false;
+    const pergunta = perguntasDoJogo[perguntaAtual];
+    if (!pergunta) return;
 
-// ======================================================
-// RESPONDER
-// ======================================================
+    const fase = Math.floor(perguntaAtual / PERGUNTAS_POR_FASE) + 1;
+    const perguntaNaFase = (perguntaAtual % PERGUNTAS_POR_FASE) + 1;
+    const respondidas = perguntaAtual % PERGUNTAS_POR_FASE;
 
-function escolherResposta(botaoEscolhido, valor) {
+    document.getElementById("faseAtual").textContent = `🏁 Fase ${fase} de ${TOTAL_FASES}`;
+    document.getElementById("numeroPergunta").textContent = `Pergunta ${perguntaNaFase} de ${PERGUNTAS_POR_FASE}`;
+    document.getElementById("progressoTexto").textContent = `Fase ${fase} — ${respondidas} de 10 respondidas — ${pergunta.nivel} — Questão ${perguntaAtual + 1}/150`;
+    document.getElementById("pontuacao").textContent = `⭐ Pontos: ${pontos}`;
+    document.getElementById("tituloJogo").textContent = jogoAtual === "bullying" ? "🛡️ A Luta Contra o Bullying" : "♿ Respeito às Diferenças";
+    document.getElementById("numeroBola").textContent = perguntaNaFase;
+    document.getElementById("pergunta").textContent = pergunta.pergunta;
+    document.getElementById("feedback").textContent = "";
+    document.getElementById("areaProxima").innerHTML = "";
 
+    const alternativas = document.getElementById("alternativas");
+    alternativas.innerHTML = "";
+
+    embaralharAlternativasSemPadrão(pergunta.alternativas).forEach((opcao, indice) => {
+        const botao = document.createElement("button");
+        botao.className = "alternativa";
+        botao.textContent = `${String.fromCharCode(65 + indice)}) ${opcao.texto}`;
+        botao.onclick = () => escolherResposta(botao, opcao.correta, pergunta.pontos);
+        alternativas.appendChild(botao);
+    });
+
+    document.getElementById("progressoFase").style.width = `${(respondidas / PERGUNTAS_POR_FASE) * 100}%`;
+}
+
+function escolherResposta(botaoEscolhido, correta, valor) {
     if (respostaDada) return;
-
     respostaDada = true;
+    document.querySelectorAll(".alternativa").forEach(botao => botao.disabled = true);
 
-    document.querySelectorAll(".alternativa")
-        .forEach(botao => {
-            botao.disabled = true;
-        });
-
-    if (valor > 0) {
-
+    if (correta) {
         pontos += valor;
-
-        botaoEscolhido.style.borderColor =
-            "#2e7d32";
-
-        botaoEscolhido.style.background =
-            "#e8f5e9";
-
-        document.getElementById("feedback")
-            .textContent =
-            "✅ Muito bem! Essa atitude demonstra respeito.";
-
+        botaoEscolhido.classList.add("resposta-certa");
+        document.getElementById("feedback").textContent = `✅ Correto! +${valor} pontos. Você demonstrou respeito e empatia.`;
         tocarSom(900);
-
     } else {
-
-        botaoEscolhido.style.borderColor =
-            "#c62828";
-
-        document.getElementById("feedback")
-            .textContent =
-            "❌ Essa não é a melhor atitude. Pense em respeito e empatia.";
-
+        botaoEscolhido.classList.add("resposta-errada");
+        document.getElementById("feedback").textContent = "❌ Essa não é a melhor escolha. Pense em respeito, segurança e empatia.";
         tocarSom(220);
     }
-
-    document.getElementById("pontuacao")
-        .textContent =
-        `⭐ Pontos: ${pontos}`;
-
-    // Salva também depois da resposta para não perder o progresso.
+    document.getElementById("pontuacao").textContent = `⭐ Pontos: ${pontos}`;
     salvarProgresso();
-
     criarBotaoProxima();
 }
 
-
-// ======================================================
-// PRÓXIMA
-// ======================================================
-
 function criarBotaoProxima() {
-
-    const area =
-        document.getElementById("areaProxima");
-
+    const area = document.getElementById("areaProxima");
     area.innerHTML = "";
-
-    const botao =
-        document.createElement("button");
-
-    const ultimaPergunta =
-        perguntaAtual === TOTAL_PERGUNTAS - 1;
-
-    const ultimaDaFase =
-        (perguntaAtual + 1) %
-            PERGUNTAS_POR_FASE === 0;
-
-    if (ultimaPergunta) {
-
-        botao.textContent =
-            "🏆 Ver resultado";
-
-    } else if (ultimaDaFase) {
-
-        botao.textContent =
-            "🚀 Ir para a próxima fase";
-
-    } else {
-
-        botao.textContent =
-            "➡️ Próxima pergunta";
-    }
-
-    botao.onclick =
-        proximaPergunta;
-
+    const botao = document.createElement("button");
+    botao.textContent = perguntaAtual === TOTAL_PERGUNTAS - 1 ? "🏆 Ver resultado" : ((perguntaAtual + 1) % PERGUNTAS_POR_FASE === 0 ? "🚀 Próxima fase" : "➡️ Próxima pergunta");
+    botao.onclick = proximaPergunta;
     area.appendChild(botao);
 }
 
 function proximaPergunta() {
-
-    salvarProgresso();
-
     perguntaAtual++;
-
     if (perguntaAtual >= TOTAL_PERGUNTAS) {
-
         mostrarResultado();
-
         return;
     }
-
-    const novaFase =
-        perguntaAtual % PERGUNTAS_POR_FASE === 0;
-
-    if (novaFase) {
-
-        mostrarMensagemFase();
-
-        tocarSom(1100);
-
-    } else {
-
-        mostrarPergunta();
-    }
+    salvarProgresso();
+    if (perguntaAtual % PERGUNTAS_POR_FASE === 0) mostrarMensagemFase();
+    else mostrarPergunta();
 }
 
 function mostrarMensagemFase() {
-
-    const fase =
-        Math.floor(
-            perguntaAtual / PERGUNTAS_POR_FASE
-        ) + 1;
-
-    document.getElementById("pergunta")
-        .textContent =
-        `🎉 Você chegou à Fase ${fase}!`;
-
-    document.getElementById("alternativas")
-        .innerHTML =
-        `<p class="centralizado">
-            Prepare-se para mais 10 perguntas.
-        </p>`;
-
-    document.getElementById("feedback")
-        .textContent =
-        "🔥 Continue! Você está avançando.";
-
-    document.getElementById("areaProxima")
-        .innerHTML = "";
-
-    const botao =
-        document.createElement("button");
-
-    botao.textContent =
-        `▶️ Começar Fase ${fase}`;
-
-    botao.onclick =
-        mostrarPergunta;
-
-    document.getElementById("areaProxima")
-        .appendChild(botao);
+    const fase = Math.floor(perguntaAtual / PERGUNTAS_POR_FASE) + 1;
+    document.getElementById("pergunta").textContent = `🎉 Você chegou à Fase ${fase}!`;
+    document.getElementById("alternativas").innerHTML = `<p class="centralizado">A dificuldade aumentou. Prepare-se para as próximas perguntas!</p>`;
+    document.getElementById("feedback").textContent = "🔥 Continue!";
+    const botao = document.createElement("button");
+    botao.textContent = `▶️ Começar Fase ${fase}`;
+    botao.onclick = mostrarPergunta;
+    document.getElementById("areaProxima").innerHTML = "";
+    document.getElementById("areaProxima").appendChild(botao);
+    tocarSom(1100);
 }
 
-
-// ======================================================
-// RESULTADO E MEDALHAS
-// ======================================================
-
+// ============================================================
+// RESULTADO / RANKING
+// ============================================================
 function mostrarResultado() {
+    const pontosMaximos = perguntasDoJogo.reduce((soma, p) => soma + p.pontos, 0);
+    const porcentagem = Math.round((pontos / pontosMaximos) * 100);
+    const medalha = porcentagem >= 90 ? "🥇 OURO" : porcentagem >= 70 ? "🥈 PRATA" : porcentagem >= 50 ? "🥉 BRONZE" : "📚 PARTICIPAÇÃO";
+    const mensagem = porcentagem >= 90 ? "Excelente! Você mostrou muito conhecimento, respeito e empatia." : porcentagem >= 70 ? "Muito bom! Você teve um ótimo desempenho." : porcentagem >= 50 ? "Bom trabalho! Continue aprendendo e praticando o respeito." : "Continue estudando. Cada pergunta é uma oportunidade para aprender.";
 
-    const porcentagem =
-        Math.round(
-            (pontos /
-                (TOTAL_PERGUNTAS * 10)) * 100
-        );
-
-    let medalha;
-    let mensagem;
-
-    if (porcentagem >= 90) {
-
-        medalha = "🥇 OURO";
-
-        mensagem =
-            "Excelente! Você demonstrou muito conhecimento, respeito e empatia.";
-
-    } else if (porcentagem >= 70) {
-
-        medalha = "🥈 PRATA";
-
-        mensagem =
-            "Muito bom! Você mostrou uma ótima compreensão do tema.";
-
-    } else if (porcentagem >= 50) {
-
-        medalha = "🥉 BRONZE";
-
-        mensagem =
-            "Bom trabalho! Continue aprendendo sobre respeito e inclusão.";
-
-    } else {
-
-        medalha = "📚 PARTICIPAÇÃO";
-
-        mensagem =
-            "Continue estudando. O importante é aprender e melhorar.";
-
-    }
-
-    document.getElementById("jogo")
-        .classList.add("escondido");
-
-    document.getElementById("resultado")
-        .classList.remove("escondido");
-
-    document.getElementById("resultadoTitulo")
-        .textContent =
-        jogoAtual === "bullying"
-            ? "🛡️ A Luta Contra o Bullying"
-            : "♿ Respeito às Diferenças";
-
-    document.getElementById("pontuacaoFinal")
-        .textContent =
-        `⭐ Pontuação: ${pontos}`;
-
-    document.getElementById("porcentagemFinal")
-        .textContent =
-        `📊 Aproveitamento: ${porcentagem}%`;
-
-    document.getElementById("medalhaFinal")
-        .textContent =
-        medalha;
-
-    document.getElementById("mensagemFinal")
-        .textContent =
-        mensagem;
-
-    salvarRanking(
-        jogoAtual,
-        pontos,
-        porcentagem,
-        medalha
-    );
-
+    document.getElementById("jogo").classList.add("escondido");
+    document.getElementById("resultado").classList.remove("escondido");
+    document.getElementById("resultadoTitulo").textContent = jogoAtual === "bullying" ? "🛡️ A Luta Contra o Bullying" : "♿ Respeito às Diferenças";
+    document.getElementById("pontuacaoFinal").textContent = `⭐ Pontuação: ${pontos}`;
+    document.getElementById("porcentagemFinal").textContent = `📊 Aproveitamento: ${porcentagem}%`;
+    document.getElementById("medalhaFinal").textContent = medalha;
+    document.getElementById("mensagemFinal").textContent = mensagem;
+    salvarRanking(jogoAtual, pontos, porcentagem, medalha);
     localStorage.removeItem(chaveProgresso(jogoAtual));
-
     tocarSom(1200);
 }
 
-
-// ======================================================
-// RANKING
-// ======================================================
-
-function salvarRanking(jogo, pontos, porcentagem, medalha) {
-
-    const ranking =
-        JSON.parse(
-            localStorage.getItem("rankingJogo") || "[]"
-        );
-
-    ranking.push({
-        jogo,
-        pontos,
-        porcentagem,
-        medalha,
-        data: new Date().toLocaleDateString("pt-BR")
-    });
-
-    ranking.sort(
-        (a, b) => b.pontos - a.pontos
-    );
-
-    localStorage.setItem(
-        "rankingJogo",
-        JSON.stringify(ranking.slice(0, 10))
-    );
+function salvarRanking(jogo, pontosValor, porcentagem, medalha) {
+    const ranking = JSON.parse(localStorage.getItem("rankingJogo") || "[]");
+    ranking.push({ jogo, pontos: pontosValor, porcentagem, medalha, data: new Date().toLocaleDateString("pt-BR") });
+    ranking.sort((a, b) => b.pontos - a.pontos);
+    localStorage.setItem("rankingJogo", JSON.stringify(ranking.slice(0, 10)));
 }
 
 function mostrarRanking() {
-
-    document.getElementById("inicio")
-        .classList.add("escondido");
-
-    document.getElementById("rankingTela")
-        .classList.remove("escondido");
-
-    const lista =
-        document.getElementById("rankingLista");
-
-    const ranking =
-        JSON.parse(
-            localStorage.getItem("rankingJogo") || "[]"
-        );
-
-    if (ranking.length === 0) {
-
-        lista.innerHTML =
-            `<p class="centralizado">
-                Ainda não existem pontuações.
-                Jogue para aparecer no ranking!
-            </p>`;
-
+    document.getElementById("inicio").classList.add("escondido");
+    document.getElementById("rankingTela").classList.remove("escondido");
+    const lista = document.getElementById("rankingLista");
+    const ranking = JSON.parse(localStorage.getItem("rankingJogo") || "[]");
+    if (!ranking.length) {
+        lista.innerHTML = `<p class="centralizado">Ainda não existem pontuações. Jogue para aparecer no ranking!</p>`;
         return;
     }
-
     lista.innerHTML = "";
-
     ranking.forEach((item, indice) => {
-
-        const div =
-            document.createElement("div");
-
-        div.className =
-            "ranking-item";
-
-        const medalhaPosicao =
-            indice === 0 ? "🥇" :
-            indice === 1 ? "🥈" :
-            indice === 2 ? "🥉" :
-            `${indice + 1}º`;
-
-        const nome =
-            item.jogo === "bullying"
-                ? "🛡️ Bullying"
-                : "♿ Inclusão";
-
-        div.innerHTML = `
-            <span class="ranking-posicao">
-                ${medalhaPosicao}
-            </span>
-
-            <span class="ranking-nome">
-                ${nome}<br>
-                <small>${item.data}</small>
-            </span>
-
-            <span class="ranking-pontos">
-                ${item.pontos} pts
-            </span>
-        `;
-
+        const div = document.createElement("div");
+        div.className = "ranking-item";
+        const posicao = indice === 0 ? "🥇" : indice === 1 ? "🥈" : indice === 2 ? "🥉" : `${indice + 1}º`;
+        const nome = item.jogo === "bullying" ? "🛡️ Bullying" : "♿ Inclusão";
+        div.innerHTML = `<span class="ranking-posicao">${posicao}</span><span class="ranking-nome">${nome}<br><small>${item.data}</small></span><span class="ranking-pontos">${item.pontos} pts</span>`;
         lista.appendChild(div);
     });
 }
 
 function fecharRanking() {
-
-    document.getElementById("rankingTela")
-        .classList.add("escondido");
-
-    document.getElementById("inicio")
-        .classList.remove("escondido");
+    document.getElementById("rankingTela").classList.add("escondido");
+    document.getElementById("inicio").classList.remove("escondido");
+    verificarJogosSalvos();
 }
 
-
-// ======================================================
-// SALVAR / CONTINUAR
-// Cada jogo possui seu próprio progresso.
-// ======================================================
-
+// ============================================================
+// SALVAMENTO: UM PROGRESSO PARA CADA JOGO
+// ============================================================
 function chaveProgresso(jogo) {
     return jogo === "bullying" ? "progressoBullying" : "progressoInclusao";
 }
 
 function salvarProgresso() {
     if (!jogoAtual || !perguntasDoJogo.length) return;
+    localStorage.setItem(chaveProgresso(jogoAtual), JSON.stringify({ jogo: jogoAtual, pergunta: perguntaAtual, pontos, ordem: perguntasDoJogo }));
+}
 
-    const dados = {
-        jogo: jogoAtual,
-        pergunta: perguntaAtual,
-        pontos: pontos,
-        ordem: perguntasDoJogo
-    };
-
-    localStorage.setItem(chaveProgresso(jogoAtual), JSON.stringify(dados));
+function obterProgresso(jogo) {
+    try {
+        const salvo = localStorage.getItem(chaveProgresso(jogo));
+        return salvo ? JSON.parse(salvo) : null;
+    } catch (erro) {
+        localStorage.removeItem(chaveProgresso(jogo));
+        return null;
+    }
 }
 
 function salvarESair() {
@@ -991,73 +453,38 @@ function salvarESair() {
     verificarJogosSalvos();
 }
 
-function obterProgresso(jogo) {
-    const salvo = localStorage.getItem(chaveProgresso(jogo));
-    if (!salvo) return null;
-    try { return JSON.parse(salvo); }
-    catch (erro) {
-        localStorage.removeItem(chaveProgresso(jogo));
-        return null;
-    }
-}
-
 function verificarJogosSalvos() {
     const area = document.getElementById("continuarArea");
     const bullying = obterProgresso("bullying");
     const inclusao = obterProgresso("inclusao");
-
     if (!bullying && !inclusao) {
         area.classList.add("escondido");
         area.innerHTML = "";
         return;
     }
-
     let html = `<h3>💾 Jogos salvos</h3>`;
-
-    if (bullying) {
-        const fase = Math.floor(bullying.pergunta / PERGUNTAS_POR_FASE) + 1;
-        const pergunta = (bullying.pergunta % PERGUNTAS_POR_FASE) + 1;
-        html += `
-            <div class="jogo-salvo">
-                <strong>🛡️ A Luta Contra o Bullying</strong>
-                <span>Fase ${fase} de ${TOTAL_FASES} — Pergunta ${pergunta} de 10 — ${bullying.pontos} pontos</span>
-                <button onclick="continuarJogo('bullying')">▶️ Continuar Bullying</button>
-                <button class="botao-apagar" onclick="apagarProgresso('bullying')">🗑️ Apagar</button>
-            </div>`;
-    }
-
-    if (inclusao) {
-        const fase = Math.floor(inclusao.pergunta / PERGUNTAS_POR_FASE) + 1;
-        const pergunta = (inclusao.pergunta % PERGUNTAS_POR_FASE) + 1;
-        html += `
-            <div class="jogo-salvo">
-                <strong>♿ Respeito às Diferenças</strong>
-                <span>Fase ${fase} de ${TOTAL_FASES} — Pergunta ${pergunta} de 10 — ${inclusao.pontos} pontos</span>
-                <button onclick="continuarJogo('inclusao')">▶️ Continuar Inclusão</button>
-                <button class="botao-apagar" onclick="apagarProgresso('inclusao')">🗑️ Apagar</button>
-            </div>`;
-    }
-
+    if (bullying) html += criarCardSalvo("bullying", bullying);
+    if (inclusao) html += criarCardSalvo("inclusao", inclusao);
     area.innerHTML = html;
     area.classList.remove("escondido");
+}
+
+function criarCardSalvo(tipo, dados) {
+    const fase = Math.min(TOTAL_FASES, Math.floor(dados.pergunta / PERGUNTAS_POR_FASE) + 1);
+    const pergunta = Math.min(PERGUNTAS_POR_FASE, (dados.pergunta % PERGUNTAS_POR_FASE) + 1);
+    const nome = tipo === "bullying" ? "🛡️ A Luta Contra o Bullying" : "♿ Respeito às Diferenças";
+    return `<div class="jogo-salvo"><strong>${nome}</strong><span>Fase ${fase} de ${TOTAL_FASES} — Pergunta ${pergunta} de 10 — ${dados.pontos} pontos</span><button onclick="continuarJogo('${tipo}')">▶️ Continuar</button><button class="botao-apagar" onclick="apagarProgresso('${tipo}')">🗑️ Apagar</button></div>`;
 }
 
 function continuarJogo(tipo) {
     const dados = obterProgresso(tipo);
     if (!dados) return;
-
-    jogoAtual = dados.jogo;
-    perguntaAtual = dados.pergunta;
-    pontos = dados.pontos;
-    perguntasDoJogo = dados.ordem || embaralhar(
-        jogoAtual === "bullying" ? perguntasBullying : perguntasInclusao
-    );
-
-    document.getElementById("inicio").classList.add("escondido");
-    document.getElementById("rankingTela").classList.add("escondido");
-    document.getElementById("resultado").classList.add("escondido");
-    document.getElementById("jogo").classList.remove("escondido");
-
+    jogoAtual = tipo;
+    perguntaAtual = Math.min(dados.pergunta || 0, TOTAL_PERGUNTAS - 1);
+    pontos = dados.pontos || 0;
+    perguntasDoJogo = Array.isArray(dados.ordem) && dados.ordem.length === TOTAL_PERGUNTAS ? dados.ordem : (tipo === "bullying" ? embaralhar(perguntasBullying) : embaralhar(perguntasInclusao));
+    window._ultimaPosicaoCorreta = undefined;
+    abrirTelaJogo();
     mostrarPergunta();
 }
 
@@ -1066,33 +493,16 @@ function apagarProgresso(tipo) {
     verificarJogosSalvos();
 }
 
-// ======================================================
-// BOTÕES FINAIS
-// ======================================================
-
 function jogarNovamente() {
-
+    localStorage.removeItem(chaveProgresso(jogoAtual));
     selecionarJogo(jogoAtual);
 }
 
 function voltarAoMenu() {
-
-    document.getElementById("resultado")
-        .classList.add("escondido");
-
-    document.getElementById("jogo")
-        .classList.add("escondido");
-
-    document.getElementById("inicio")
-        .classList.remove("escondido");
-
-    verificarJogoSalvo();
+    document.getElementById("resultado").classList.add("escondido");
+    document.getElementById("jogo").classList.add("escondido");
+    document.getElementById("inicio").classList.remove("escondido");
+    verificarJogosSalvos();
 }
 
-
-// ======================================================
-// INICIAR
-// ======================================================
-
-window.onload =
-    verificarJogoSalvo;
+window.addEventListener("load", verificarJogosSalvos);

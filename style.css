@@ -522,3 +522,22 @@ footer p {
         scroll-behavior: auto !important;
     }
 }
+
+
+/* =========================
+   DOIS PROGRESSOS SALVOS
+========================= */
+.jogo-salvo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 15px;
+    padding: 18px;
+    border-radius: 15px;
+    background: white;
+    border: 2px solid #7b1fa2;
+    text-align: left;
+}
+.jogo-salvo strong { color: #6a1b9a; font-size: 18px; }
+.jogo-salvo span { color: #455a64; font-size: 15px; line-height: 1.5; }
+.jogo-salvo button { margin-top: 6px; }

@@ -661,7 +661,7 @@ function mostrarResultado() {
         medalha
     );
 
-    localStorage.removeItem("progressoJogo");
+    localStorage.removeItem(chaveProgresso(jogoAtual));
 
     tocarSom(1200);
 }
@@ -775,9 +775,15 @@ function fecharRanking() {
 
 // ======================================================
 // SALVAR / CONTINUAR
+// Cada jogo possui seu próprio progresso.
 // ======================================================
 
+function chaveProgresso(jogo) {
+    return jogo === "bullying" ? "progressoBullying" : "progressoInclusao";
+}
+
 function salvarProgresso() {
+    if (!jogoAtual || !perguntasDoJogo.length) return;
 
     const dados = {
         jogo: jogoAtual,
@@ -786,111 +792,90 @@ function salvarProgresso() {
         ordem: perguntasDoJogo
     };
 
-    localStorage.setItem(
-        "progressoJogo",
-        JSON.stringify(dados)
-    );
+    localStorage.setItem(chaveProgresso(jogoAtual), JSON.stringify(dados));
 }
 
 function salvarESair() {
-
     salvarProgresso();
-
-    document.getElementById("jogo")
-        .classList.add("escondido");
-
-    document.getElementById("inicio")
-        .classList.remove("escondido");
-
-    verificarJogoSalvo();
+    document.getElementById("jogo").classList.add("escondido");
+    document.getElementById("inicio").classList.remove("escondido");
+    verificarJogosSalvos();
 }
 
-function verificarJogoSalvo() {
+function obterProgresso(jogo) {
+    const salvo = localStorage.getItem(chaveProgresso(jogo));
+    if (!salvo) return null;
+    try { return JSON.parse(salvo); }
+    catch (erro) {
+        localStorage.removeItem(chaveProgresso(jogo));
+        return null;
+    }
+}
 
-    const salvo =
-        localStorage.getItem("progressoJogo");
+function verificarJogosSalvos() {
+    const area = document.getElementById("continuarArea");
+    const bullying = obterProgresso("bullying");
+    const inclusao = obterProgresso("inclusao");
 
-    const area =
-        document.getElementById("continuarArea");
-
-    if (!salvo) {
-
+    if (!bullying && !inclusao) {
         area.classList.add("escondido");
-
+        area.innerHTML = "";
         return;
     }
 
-    const dados =
-        JSON.parse(salvo);
+    let html = `<h3>💾 Jogos salvos</h3>`;
 
-    const nome =
-        dados.jogo === "bullying"
-            ? "A Luta Contra o Bullying"
-            : "Respeito às Diferenças";
+    if (bullying) {
+        const fase = Math.floor(bullying.pergunta / PERGUNTAS_POR_FASE) + 1;
+        const pergunta = (bullying.pergunta % PERGUNTAS_POR_FASE) + 1;
+        html += `
+            <div class="jogo-salvo">
+                <strong>🛡️ A Luta Contra o Bullying</strong>
+                <span>Fase ${fase} de ${TOTAL_FASES} — Pergunta ${pergunta} de 10 — ${bullying.pontos} pontos</span>
+                <button onclick="continuarJogo('bullying')">▶️ Continuar Bullying</button>
+                <button class="botao-apagar" onclick="apagarProgresso('bullying')">🗑️ Apagar</button>
+            </div>`;
+    }
 
-    const fase =
-        Math.floor(
-            dados.pergunta / PERGUNTAS_POR_FASE
-        ) + 1;
+    if (inclusao) {
+        const fase = Math.floor(inclusao.pergunta / PERGUNTAS_POR_FASE) + 1;
+        const pergunta = (inclusao.pergunta % PERGUNTAS_POR_FASE) + 1;
+        html += `
+            <div class="jogo-salvo">
+                <strong>♿ Respeito às Diferenças</strong>
+                <span>Fase ${fase} de ${TOTAL_FASES} — Pergunta ${pergunta} de 10 — ${inclusao.pontos} pontos</span>
+                <button onclick="continuarJogo('inclusao')">▶️ Continuar Inclusão</button>
+                <button class="botao-apagar" onclick="apagarProgresso('inclusao')">🗑️ Apagar</button>
+            </div>`;
+    }
 
-    const pergunta =
-        (dados.pergunta %
-            PERGUNTAS_POR_FASE) + 1;
-
-    document.getElementById("jogoSalvoTexto")
-        .textContent =
-        `${nome} — Fase ${fase}, pergunta ${pergunta}. Pontos: ${dados.pontos}.`;
-
+    area.innerHTML = html;
     area.classList.remove("escondido");
 }
 
-function continuarJogo() {
-
-    const salvo =
-        localStorage.getItem("progressoJogo");
-
-    if (!salvo) return;
-
-    const dados =
-        JSON.parse(salvo);
+function continuarJogo(tipo) {
+    const dados = obterProgresso(tipo);
+    if (!dados) return;
 
     jogoAtual = dados.jogo;
-
     perguntaAtual = dados.pergunta;
-
     pontos = dados.pontos;
+    perguntasDoJogo = dados.ordem || embaralhar(
+        jogoAtual === "bullying" ? perguntasBullying : perguntasInclusao
+    );
 
-    perguntasDoJogo =
-        dados.ordem ||
-        embaralhar(
-            jogoAtual === "bullying"
-                ? perguntasBullying
-                : perguntasInclusao
-        );
-
-    document.getElementById("inicio")
-        .classList.add("escondido");
-
-    document.getElementById("rankingTela")
-        .classList.add("escondido");
-
-    document.getElementById("resultado")
-        .classList.add("escondido");
-
-    document.getElementById("jogo")
-        .classList.remove("escondido");
+    document.getElementById("inicio").classList.add("escondido");
+    document.getElementById("rankingTela").classList.add("escondido");
+    document.getElementById("resultado").classList.add("escondido");
+    document.getElementById("jogo").classList.remove("escondido");
 
     mostrarPergunta();
 }
 
-function apagarProgresso() {
-
-    localStorage.removeItem("progressoJogo");
-
-    document.getElementById("continuarArea")
-        .classList.add("escondido");
+function apagarProgresso(tipo) {
+    localStorage.removeItem(chaveProgresso(tipo));
+    verificarJogosSalvos();
 }
-
 
 // ======================================================
 // BOTÕES FINAIS

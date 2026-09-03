@@ -340,11 +340,16 @@ function gerarPerguntas(temas) {
             indice < 90 ? 15 :
             indice < 120 ? 20 : 25;
 
-        // Atualiza apenas a alternativa correta.
+        // Mantém a pontuação da resposta correta.
         questao.alternativas = questao.alternativas.map(([texto, valor]) => [
             texto,
             valor > 0 ? pontosProgressivos : 0
         ]);
+
+        // IMPORTANTE: a alternativa correta não pode ser identificada pelo tamanho.
+        // Se ela ficar sendo a maior, aumentamos uma alternativa errada com uma
+        // continuação natural. Assim, o jogador precisa realmente analisar a questão.
+        questao.alternativas = equilibrarTamanhoAlternativas(questao.alternativas);
     });
 
     return resultado;
@@ -352,6 +357,43 @@ function gerarPerguntas(temas) {
 
 const perguntasBullying = gerarPerguntas(temasBullying);
 const perguntasInclusao = gerarPerguntas(temasInclusao);
+
+
+// ======================================================
+// EMBARALHAR
+// ======================================================
+
+function equilibrarTamanhoAlternativas(alternativas) {
+
+    const opcoes = alternativas.map(([texto, valor]) => ({ texto, valor }));
+    const correta = opcoes.find(opcao => opcao.valor > 0);
+    const erradas = opcoes.filter(opcao => opcao.valor === 0);
+
+    if (!correta || erradas.length === 0) return alternativas;
+
+    const maiorErrada = erradas.reduce((maior, atual) =>
+        atual.texto.length > maior.texto.length ? atual : maior
+    );
+
+    // Não deixamos a resposta correta ser sempre a maior alternativa.
+    if (correta.texto.length >= maiorErrada.texto.length) {
+        const complementos = [
+            " mesmo quando a situação parece uma simples brincadeira.",
+            " porque essa atitude pode afetar a outra pessoa e piorar o problema.",
+            " mesmo que outras pessoas do grupo digam que não há nada de errado.",
+            " considerando também as consequências para quem está sendo afetado.",
+            " especialmente quando isso acontece repetidamente ou diante de outras pessoas."
+        ];
+
+        const complemento = complementos[
+            Math.floor(Math.random() * complementos.length)
+        ];
+
+        maiorErrada.texto += complemento;
+    }
+
+    return opcoes.map(opcao => [opcao.texto, opcao.valor]);
+}
 
 
 // ======================================================

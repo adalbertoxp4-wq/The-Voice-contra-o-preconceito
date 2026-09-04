@@ -219,6 +219,8 @@ const modelos = [
 
     resultado.forEach((questao, indice) => {
         questao.numeroDificuldade = indice + 1;
+        questao.nivel = indice + 1;
+        window.__numeroPerguntaAtual = indice + 1;
         window.__numeroPerguntaAtual = indice + 1;
 
         if (indice < 30) {
@@ -244,6 +246,7 @@ const modelos = [
             valor > 0 ? pontosProgressivos : 0
         ]);
 
+        window.__numeroPerguntaAtual = questao.numeroDificuldade || (perguntaAtual + 1);
         window.__numeroPerguntaAtual = questao.numeroDificuldade || (perguntaAtual + 1);
         questao.alternativas = equilibrarTamanhoAlternativas(questao.alternativas);
     });
@@ -273,120 +276,113 @@ function alongarRespostaCorreta(texto) {
 
 function equilibrarTamanhoAlternativas(alternativas) {
     /*
-     * A resposta correta NÃO fica sempre maior.
-     * Padrões usados:
-     * 1 = correta menor que as erradas
-     * 2 = correta média
-     * 3 = correta maior que algumas, mas menor que outra
-     * 4 = correta aproximadamente do mesmo tamanho
-     *
-     * A escolha do padrão depende da posição da pergunta.
+     * O tamanho da alternativa correta varia de propósito.
+     * Em algumas perguntas ela é menor que TODAS as erradas.
+     * Em outras, uma ou mais erradas são maiores que ela.
+     * Em outras, ela fica no meio.
+     * Assim, o jogador não consegue descobrir a resposta pelo tamanho.
      */
 
     const copia = alternativas.map(([texto, valor]) => [texto, valor]);
-    const indiceCorreta = copia.findIndex(([, valor]) => valor > 0);
+    const correta = copia.findIndex(([, valor]) => valor > 0);
 
-    if (indiceCorreta === -1) return copia;
+    if (correta === -1) return copia;
 
-    // Remove possíveis exageros e deixa cada alternativa com uma extensão natural.
     const erradas = copia
         .map(([texto, valor], i) => ({ texto, valor, i }))
-        .filter(item => item.i !== indiceCorreta);
+        .filter(item => item.i !== correta)
+        .sort((a, b) => a.texto.length - b.texto.length);
 
-    const base = copia[indiceCorreta][0];
+    const n = window.__numeroPerguntaAtual || 1;
+    const padrao = (n - 1) % 6;
 
-    // Pequenas extensões naturais para controlar o tamanho das erradas.
-    const complementos = [
-        " sem pensar nas consequências.",
-        " diante da turma.",
-        " naquele momento.",
-        " para evitar o problema.",
-        " sem procurar ajuda.",
-        " em vez de conversar.",
-        " quando a situação acontece."
+    const extras = [
+        " para evitar que o problema continue.",
+        " e procurar uma solução responsável.",
+        " pensando nas consequências para todos.",
+        " sem aumentar o conflito entre as pessoas.",
+        " de forma respeitosa e segura.",
+        " para melhorar a convivência na escola."
     ];
 
-    const curta = base
-        .replace(/\s+/g, " ")
-        .replace(/\b(e procurar ajuda|e comunicar um responsável ou professor|e guardar evidências)\b/gi, "")
-        .replace(/[,.]\s*$/, "")
-        .trim();
+    // 0 e 3: correta MENOR que todas as erradas.
+    if (padrao === 0 || padrao === 3) {
+        let c = copia[correta][0]
+            .replace(/,\s*(e|mas|porque)\b.*$/i, "")
+            .replace(/\.\s*$/, "")
+            .trim();
 
-    const corretaCurta = curta.length >= 12 ? curta : base;
+        if (c.length > 55) {
+            c = c.split(/\s+/).slice(0, 8).join(" ");
+        }
 
-    // Número pseudoaleatório estável: não muda toda vez que a pergunta é exibida.
-    const perguntaNumero = Number.isInteger(window.__numeroPerguntaAtual)
-        ? window.__numeroPerguntaAtual
-        : 0;
-    const padrao = perguntaNumero % 4;
-
-    if (padrao === 0) {
-        // CORRETA MENOR QUE AS ERRADAS.
-        copia[indiceCorreta][0] = corretaCurta;
+        copia[correta][0] = c.endsWith(".") ? c : c + ".";
 
         erradas.forEach((item, i) => {
             let t = item.texto.trim();
-            if (t.length <= corretaCurta.length + 5) {
-                t += complementos[i % complementos.length];
-            }
-            if (t.length <= corretaCurta.length + 10) {
-                t += " Essa escolha pode piorar a situação.";
+            while (t.length <= copia[correta][0].length + 10) {
+                t += extras[i % extras.length];
             }
             copia[item.i][0] = t;
         });
+    }
 
-    } else if (padrao === 1) {
-        // CORRETA MÉDIA: uma errada menor, duas maiores.
-        const ordenadas = [...erradas].sort(
-            (a, b) => a.texto.length - b.texto.length
-        );
-
-        if (ordenadas[0].texto.length >= base.length) {
-            copia[ordenadas[0].i][0] =
-                ordenadas[0].texto.replace(/[.!?]$/, "") + ".";
+    // 1 e 4: uma errada menor e pelo menos duas maiores que a correta.
+    else if (padrao === 1 || padrao === 4) {
+        let c = copia[correta][0].trim();
+        if (c.length > 95) {
+            c = c.substring(0, 90).replace(/\s+\S*$/, "") + ".";
         }
+        copia[correta][0] = c;
 
-        for (let j = 1; j < ordenadas.length; j++) {
-            let t = ordenadas[j].texto;
-            if (t.length <= base.length + 4) {
-                t += complementos[j % complementos.length];
+        // menor
+        copia[erradas[0].i][0] =
+            erradas[0].texto.split(/[,.!?]/)[0].trim() + ".";
+
+        // maiores
+        for (let i = 1; i < erradas.length; i++) {
+            let t = erradas[i].texto;
+            while (t.length <= c.length + (i === 1 ? 8 : 22)) {
+                t += extras[(i + n) % extras.length];
             }
-            copia[ordenadas[j].i][0] = t;
+            copia[erradas[i].i][0] = t;
         }
+    }
 
-    } else if (padrao === 2) {
-        // CORRETA MAIOR QUE ALGUMAS, MAS MENOR QUE PELO MENOS UMA.
-        const ordenadas = [...erradas].sort(
-            (a, b) => a.texto.length - b.texto.length
-        );
+    // 2: correta fica entre uma errada menor e duas maiores.
+    else if (padrao === 2) {
+        const c = copia[correta][0].trim();
+        copia[correta][0] = c;
 
-        copia[ordenadas[0].i][0] =
-            ordenadas[0].texto.split(/[,.!?]/)[0].trim() + ".";
+        copia[erradas[0].i][0] =
+            erradas[0].texto.split(/[,.!?]/)[0].trim() + ".";
 
-        copia[ordenadas[1].i][0] =
-            ordenadas[1].texto.length > 8
-                ? ordenadas[1].texto
-                : ordenadas[1].texto + complementos[1];
-
-        let maior = ordenadas[2].texto;
-        while (maior.length <= base.length + 8) {
-            maior += " Essa atitude também traz consequências para a convivência.";
-        }
-        copia[ordenadas[2].i][0] = maior;
-
-    } else {
-        // CORRETA DE TAMANHO PARECIDO: nenhuma pista clara.
-        erradas.forEach((item, i) => {
-            let t = item.texto;
-
-            if (t.length < base.length - 10) {
-                t += complementos[i % complementos.length];
-            } else if (t.length > base.length + 25) {
-                t = t.substring(0, base.length + 15).replace(/\s+\S*$/, "") + ".";
+        for (let i = 1; i < erradas.length; i++) {
+            let t = erradas[i].texto;
+            while (t.length <= c.length + 10) {
+                t += extras[(i + n) % extras.length];
             }
+            copia[erradas[i].i][0] = t;
+        }
+    }
 
-            copia[item.i][0] = t;
-        });
+    // 5: tamanhos misturados, sem padrão óbvio.
+    else {
+        const c = copia[correta][0].trim();
+        copia[correta][0] = c;
+
+        copia[erradas[0].i][0] =
+            erradas[0].texto.split(/[,.!?]/)[0].trim() + ".";
+
+        let t = erradas[1].texto;
+        if (t.length < c.length + 5) t += extras[n % extras.length];
+        copia[erradas[1].i][0] = t;
+
+        t = erradas[2].texto;
+        while (t.length <= c.length + 18) {
+            t += extras[(n + 2) % extras.length];
+        }
+        copia[erradas[2].i][0] = t;
     }
 
     return copia;

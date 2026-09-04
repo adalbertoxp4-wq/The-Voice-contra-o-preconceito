@@ -25,6 +25,7 @@ let audioContext = null;
 const temasBullying = [
     {
         assunto: "bullying",
+        expressao: "uma situação de bullying",
         correta: "Apoiar a vítima e procurar ajuda de um adulto de confiança.",
         errada1: "Ignorar a situação e deixar a agressão continuar.",
         errada2: "Participar da agressão para tentar se enturmar.",
@@ -32,6 +33,7 @@ const temasBullying = [
     },
     {
         assunto: "cyberbullying",
+        expressao: "uma situação de cyberbullying",
         correta: "Guardar as provas, não revidar e procurar ajuda.",
         errada1: "Responder com outra ofensa.",
         errada2: "Compartilhar a mensagem ofensiva com mais pessoas.",
@@ -39,6 +41,7 @@ const temasBullying = [
     },
     {
         assunto: "empatia",
+        expressao: "uma atitude de empatia",
         correta: "Ouvir a pessoa e tentar compreender o que ela está sentindo.",
         errada1: "Dizer que o sentimento dela não importa.",
         errada2: "Fazer piada com o problema.",
@@ -46,6 +49,7 @@ const temasBullying = [
     },
     {
         assunto: "exclusão",
+        expressao: "uma situação de exclusão",
         correta: "Convidar a pessoa para participar e tratá-la com respeito.",
         errada1: "Impedir que ela participe de propósito.",
         errada2: "Fazer comentários para deixá-la constrangida.",
@@ -53,6 +57,7 @@ const temasBullying = [
     },
     {
         assunto: "apelidos ofensivos",
+        expressao: "o uso de apelidos ofensivos",
         correta: "Parar de usar o apelido e respeitar o nome da pessoa.",
         errada1: "Continuar usando mesmo depois de ela pedir para parar.",
         errada2: "Criar um apelido ainda mais ofensivo.",
@@ -60,34 +65,35 @@ const temasBullying = [
     },
     {
         assunto: "respeito",
+        expressao: "uma atitude de respeito",
         correta: "Tratar as pessoas com educação mesmo quando pensamos diferente.",
         errada1: "Humilhar quem possui uma opinião diferente.",
         errada2: "Usar diferenças pessoais para ofender.",
         errada3: "Evitar conversar com quem pensa diferente."
     },
     {
-        assunto: "testemunha",
+        assunto: "uma situação presenciada por uma testemunha",
         correta: "Apoiar a vítima e comunicar o ocorrido a alguém responsável.",
         errada1: "Filmar a agressão para publicar nas redes.",
         errada2: "Incentivar os envolvidos a continuar brigando.",
         errada3: "Publicar o vídeo para conseguir mais visualizações."
     },
     {
-        assunto: "preconceito",
+        assunto: "uma situação de preconceito",
         correta: "Questionar estereótipos e conhecer as pessoas sem julgamentos.",
         errada1: "Julgar alguém apenas pela aparência.",
         errada2: "Espalhar estereótipos como se fossem verdades.",
         errada3: "Tirar conclusões sobre alguém sem conhecê-lo."
     },
     {
-        assunto: "diferenças",
+        assunto: "o respeito às diferenças",
         correta: "Valorizar as diferenças e tratar todos com dignidade.",
         errada1: "Afastar alguém por ser diferente.",
         errada2: "Usar uma característica da pessoa para ridicularizá-la.",
         errada3: "Afastar a pessoa das atividades do grupo."
     },
     {
-        assunto: "escola",
+        assunto: "uma situação de bullying na escola",
         correta: "Promover diálogo, respeito e comunicar situações de agressão.",
         errada1: "Esconder agressões para evitar problemas.",
         errada2: "Dizer que bullying é apenas brincadeira."
@@ -96,70 +102,70 @@ const temasBullying = [
 
 const temasInclusao = [
     {
-        assunto: "deficiência",
+        assunto: "uma pessoa com deficiência",
         correta: "Tratar a pessoa com respeito e perguntar se ela precisa de ajuda.",
         errada1: "Decidir por ela sem perguntar o que deseja.",
         errada2: "Fazer comentários ofensivos sobre sua deficiência.",
         errada3: "Tomar decisões por ela sem perguntar."
     },
     {
-        assunto: "acessibilidade",
+        assunto: "uma questão de acessibilidade",
         correta: "Garantir que pessoas diferentes possam participar com autonomia e segurança.",
         errada1: "Bloquear rampas e caminhos acessíveis.",
         errada2: "Retirar recursos de acessibilidade sem necessidade.",
         errada3: "Deixar obstáculos em caminhos adaptados."
     },
     {
-        assunto: "capacitismo",
+        assunto: "uma situação de capacitismo",
         correta: "Respeitar a autonomia e combater atitudes discriminatórias.",
         errada1: "Considerar uma pessoa incapaz apenas por ter deficiência.",
         errada2: "Fazer piadas sobre deficiência.",
         errada3: "Supor limites sem conversar com a pessoa."
     },
     {
-        assunto: "autismo",
+        assunto: "uma pessoa autista",
         correta: "Respeitar as necessidades, a comunicação e a individualidade da pessoa.",
         errada1: "Forçar a pessoa a agir exatamente como todos os outros.",
         errada2: "Fazer piadas sobre características do autismo.",
         errada3: "Ignorar formas diferentes de comunicação."
     },
     {
-        assunto: "idosos",
+        assunto: "uma pessoa idosa",
         correta: "Respeitar a autonomia, ouvir e oferecer ajuda quando necessário.",
         errada1: "Tratar toda pessoa idosa como incapaz.",
         errada2: "Ignorar sua opinião.",
         errada3: "Decidir tudo por ele sem necessidade."
     },
     {
-        assunto: "cadeira de rodas",
+        assunto: "uma pessoa que utiliza cadeira de rodas",
         correta: "Não tocar ou movimentar a cadeira sem autorização.",
         errada1: "Empurrar a cadeira sem perguntar.",
         errada2: "Usar a cadeira como apoio ou brincadeira.",
         errada3: "Mexer na cadeira sem autorização."
     },
     {
-        assunto: "linguagem respeitosa",
+        assunto: "o uso de uma linguagem respeitosa",
         correta: "Usar palavras respeitosas e evitar termos ofensivos.",
         errada1: "Usar apelidos humilhantes.",
         errada2: "Fazer piadas com características pessoais.",
         errada3: "Imitar a pessoa para constrangê-la."
     },
     {
-        assunto: "inclusão",
+        assunto: "uma situação de inclusão",
         correta: "Criar condições para que todos possam participar.",
         errada1: "Excluir quem precisa de adaptação.",
         errada2: "Impedir a participação de alguém por causa de uma diferença.",
         errada3: "Deixar a pessoa de fora das atividades."
     },
     {
-        assunto: "equidade",
+        assunto: "uma questão de equidade",
         correta: "Oferecer os recursos necessários para que todos tenham oportunidades justas.",
         errada1: "Dar exatamente o mesmo recurso sem considerar necessidades.",
         errada2: "Recusar adaptações necessárias.",
         errada3: "Oferecer ajuda sem avaliar a necessidade."
     },
     {
-        assunto: "diversidade",
+        assunto: "o respeito à diversidade",
         correta: "Conhecer, ouvir e respeitar pessoas com diferentes características.",
         errada1: "Julgar alguém antes de conhecê-lo.",
         errada2: "Afastar pessoas que não se encaixam em um padrão.",
@@ -183,21 +189,21 @@ function obterPontuacaoPorNivel(nivel) {
 function gerarPerguntas(temas) {
 
 const modelos = [
-        { nivel: 1, nome: "Iniciante", texto: "Qual atitude ajuda a enfrentar ASSUNTO?" },
-        { nivel: 2, nome: "Iniciante", texto: "Ao perceber uma situação de ASSUNTO, qual é a melhor reação?" },
-        { nivel: 3, nome: "Intermediário", texto: "Qual comportamento demonstra respeito diante de ASSUNTO?" },
-        { nivel: 4, nome: "Intermediário", texto: "Em uma situação de ASSUNTO, qual escolha tende a ajudar?" },
-        { nivel: 5, nome: "Intermediário", texto: "Por que é importante agir corretamente diante de ASSUNTO?" },
-        { nivel: 6, nome: "Difícil", texto: "Um estudante presencia ASSUNTO. Qual decisão é mais responsável?" },
-        { nivel: 7, nome: "Difícil", texto: "Qual atitude pode reduzir os efeitos de ASSUNTO no ambiente escolar?" },
-        { nivel: 8, nome: "Difícil", texto: "Diante de ASSUNTO, qual resposta evita agravar o conflito?" },
-        { nivel: 9, nome: "Muito difícil", texto: "Considere uma situação de ASSUNTO. Qual alternativa apresenta a ação mais adequada?" },
-        { nivel: 10, nome: "Muito difícil", texto: "Em um caso envolvendo ASSUNTO, qual análise melhor orienta uma atitude respeitosa?" },
-        { nivel: 11, nome: "Muito difícil", texto: "Se uma pessoa sofre ASSUNTO repetidamente, qual medida deve ser priorizada?" },
-        { nivel: 12, nome: "Desafio máximo", texto: "Imagine que você precise intervir em uma situação de ASSUNTO. Qual escolha é mais segura e ética?" },
-        { nivel: 13, nome: "Desafio máximo", texto: "Uma turma enfrenta um problema relacionado a ASSUNTO. Qual ação tende a produzir uma solução mais justa?" },
-        { nivel: 14, nome: "Desafio máximo", texto: "Analise uma situação de ASSUNTO em que diferentes pessoas discordam. Qual conduta demonstra maior responsabilidade?" },
-        { nivel: 15, nome: "Desafio máximo", texto: "Em um cenário complexo envolvendo ASSUNTO, qual decisão melhor combina respeito, segurança e responsabilidade?" }
+        { nivel: 1, nome: "Iniciante", texto: "Qual atitude ajuda a enfrentar EXPRESSION?" },
+        { nivel: 2, nome: "Iniciante", texto: "Ao perceber EXPRESSION, qual é a melhor reação?" },
+        { nivel: 3, nome: "Intermediário", texto: "Qual comportamento demonstra respeito ao lidar com EXPRESSION?" },
+        { nivel: 4, nome: "Intermediário", texto: "Ao lidar com EXPRESSION, qual escolha tende a ajudar?" },
+        { nivel: 5, nome: "Intermediário", texto: "Por que é importante agir corretamente diante de EXPRESSION?" },
+        { nivel: 6, nome: "Difícil", texto: "Um estudante presencia EXPRESSION. Qual decisão é mais responsável?" },
+        { nivel: 7, nome: "Difícil", texto: "Qual atitude pode reduzir os efeitos de EXPRESSION no ambiente escolar?" },
+        { nivel: 8, nome: "Difícil", texto: "Diante de EXPRESSION, qual resposta evita agravar o conflito?" },
+        { nivel: 9, nome: "Muito difícil", texto: "Considere EXPRESSION. Qual alternativa apresenta a ação mais adequada?" },
+        { nivel: 10, nome: "Muito difícil", texto: "Em um caso envolvendo EXPRESSION, qual análise melhor orienta uma atitude respeitosa?" },
+        { nivel: 11, nome: "Muito difícil", texto: "Se uma pessoa vivencia EXPRESSION repetidamente, qual medida deve ser priorizada?" },
+        { nivel: 12, nome: "Desafio máximo", texto: "Imagine que você precise intervir em EXPRESSION. Qual escolha é mais segura e ética?" },
+        { nivel: 13, nome: "Desafio máximo", texto: "Uma turma enfrenta um problema relacionado a EXPRESSION. Qual ação tende a produzir uma solução mais justa?" },
+        { nivel: 14, nome: "Desafio máximo", texto: "Analise EXPRESSION em uma situação na qual diferentes pessoas discordam. Qual conduta demonstra maior responsabilidade?" },
+        { nivel: 15, nome: "Desafio máximo", texto: "Em um cenário complexo envolvendo EXPRESSION, qual decisão melhor combina respeito, segurança e responsabilidade?" }
     ];
 
     const resultado = [];
@@ -217,7 +223,7 @@ const modelos = [
             }
 
             resultado.push({
-                pergunta: modelo.texto.replace("ASSUNTO", tema.assunto),
+                pergunta: modelo.texto.replace("EXPRESSION", tema.expressao || tema.assunto),
                 nivel: modelo.nivel,
                 nomeNivel: modelo.nome,
                 alternativas: [

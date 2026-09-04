@@ -134,31 +134,36 @@ const temasInclusao = [
         assunto: "cadeira de rodas",
         correta: "Não tocar ou movimentar a cadeira sem autorização.",
         errada1: "Empurrar a cadeira sem perguntar.",
-        errada2: "Usar a cadeira como apoio ou brincadeira."
+        errada2: "Usar a cadeira como apoio ou brincadeira.",
+        errada3: "Mexer na cadeira sem autorização."
     },
     {
         assunto: "linguagem respeitosa",
         correta: "Usar palavras respeitosas e evitar termos ofensivos.",
         errada1: "Usar apelidos humilhantes.",
-        errada2: "Fazer piadas com características pessoais."
+        errada2: "Fazer piadas com características pessoais.",
+        errada3: "Imitar a pessoa para constrangê-la."
     },
     {
         assunto: "inclusão",
         correta: "Criar condições para que todos possam participar.",
         errada1: "Excluir quem precisa de adaptação.",
-        errada2: "Impedir a participação de alguém por causa de uma diferença."
+        errada2: "Impedir a participação de alguém por causa de uma diferença.",
+        errada3: "Deixar a pessoa de fora das atividades."
     },
     {
         assunto: "equidade",
         correta: "Oferecer os recursos necessários para que todos tenham oportunidades justas.",
         errada1: "Dar exatamente o mesmo recurso sem considerar necessidades.",
-        errada2: "Recusar adaptações necessárias."
+        errada2: "Recusar adaptações necessárias.",
+        errada3: "Oferecer ajuda sem avaliar a necessidade."
     },
     {
         assunto: "diversidade",
         correta: "Conhecer, ouvir e respeitar pessoas com diferentes características.",
         errada1: "Julgar alguém antes de conhecê-lo.",
-        errada2: "Afastar pessoas que não se encaixam em um padrão."
+        errada2: "Afastar pessoas que não se encaixam em um padrão.",
+        errada3: "Tratar diferenças como defeitos."
     }
 ];
 
@@ -166,6 +171,16 @@ const temasInclusao = [
 // ======================================================
 // CRIA 150 PERGUNTAS
 // ======================================================
+
+function obterPontuacaoPorNivel(nivel) {
+    if (nivel <= 3) return 10;
+    if (nivel <= 6) return 12;
+    if (nivel <= 9) return 15;
+    if (nivel <= 12) return 20;
+    return 25;
+}
+
+function gerarPerguntas(temas) {
 
 const modelos = [
         { nivel: 1, nome: "Iniciante", texto: "Qual atitude ajuda a enfrentar ASSUNTO?" },
@@ -221,19 +236,15 @@ const modelos = [
         questao.numeroDificuldade = indice + 1;
         questao.nivel = indice + 1;
         window.__numeroPerguntaAtual = indice + 1;
-        window.__numeroPerguntaAtual = indice + 1;
 
-        if (indice < 30) {
-            questao.nomeNivel = "🟢 Iniciante";
-        } else if (indice < 60) {
-            questao.nomeNivel = "🟡 Intermediário";
-        } else if (indice < 90) {
-            questao.nomeNivel = "🟠 Difícil";
-        } else if (indice < 120) {
-            questao.nomeNivel = "🔴 Muito difícil";
-        } else {
-            questao.nomeNivel = "🟣 Desafio máximo";
-        }
+        const niveis = [
+            "🟢 Iniciante", "🟢 Iniciante +", "🟢 Básico",
+            "🟡 Básico +", "🟡 Intermediário", "🟡 Intermediário +",
+            "🟠 Médio", "🟠 Médio +", "🟠 Difícil",
+            "🔴 Difícil +", "🔴 Avançado", "🔴 Avançado +",
+            "🟣 Muito difícil", "🟣 Expert", "🟣 Desafio máximo"
+        ];
+        questao.nomeNivel = niveis[Math.floor(indice / 10)];
 
         const pontosProgressivos =
             indice < 30 ? 10 :
@@ -246,7 +257,6 @@ const modelos = [
             valor > 0 ? pontosProgressivos : 0
         ]);
 
-        window.__numeroPerguntaAtual = questao.numeroDificuldade || (perguntaAtual + 1);
         window.__numeroPerguntaAtual = questao.numeroDificuldade || (perguntaAtual + 1);
         questao.alternativas = equilibrarTamanhoAlternativas(questao.alternativas);
     });
@@ -546,7 +556,7 @@ function mostrarPergunta() {
 
     document.getElementById("progressoTexto")
         .textContent =
-        `Fase ${fase} — ${respondidas} de 10 respondidas — 🔥 ${pergunta.nomeNivel} — Desafio ${numeroDesafio}/150`;
+        `Fase ${fase} — ${respondidas} de 10 respondidas — 🔥 Nível ${numeroDesafio}/150 — ${pergunta.nomeNivel}`;
 
     document.getElementById("pontuacao")
         .textContent =
@@ -1086,7 +1096,7 @@ function voltarAoMenu() {
     document.getElementById("inicio")
         .classList.remove("escondido");
 
-    verificarJogoSalvo();
+    verificarJogosSalvos();
 }
 
 
@@ -1095,4 +1105,4 @@ function voltarAoMenu() {
 // ======================================================
 
 window.onload =
-    verificarJogoSalvo;
+    verificarJogosSalvos;

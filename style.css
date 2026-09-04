@@ -541,11 +541,3 @@ footer p {
 .jogo-salvo strong { color: #6a1b9a; font-size: 18px; }
 .jogo-salvo span { color: #455a64; font-size: 15px; line-height: 1.5; }
 .jogo-salvo button { margin-top: 6px; }
-
-/* Correção: todas as alternativas ocupam o mesmo espaço visual. */
-.alternativa {
-    width: 100%;
-    min-height: 92px;
-    box-sizing: border-box;
-    line-height: 1.45;
-}
